@@ -1,0 +1,33 @@
+{
+  "name": "epitech.js",
+  "keywords": [
+    "epitech",
+    "intra",
+    "api",
+    "wrapper"
+  ],
+  "version": "0.1.0",
+  "description": "Library to interact with the Epitech intranet",
+  "main": "out/index.js",
+  "scripts": {
+    "prepublishOnly": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/norech/epitech.js.git"
+  },
+  "author": "Norech <Alexis CHERON>",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.4.2"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "striptags": "^3.2.0"
+  },
+  "bugs": {
+    "url": "https://github.com/norech/epitech.js/issues"
+  },
+  "homepage": "https://github.com/norech/epitech.js#readme"
+}
