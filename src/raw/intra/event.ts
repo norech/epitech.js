@@ -1,4 +1,4 @@
-import { ActivityCode, ActivityTypeCode, ActivityTypeTitle, DatetimeLiteral, EventCode, HourLiteral, InstanceCode, MinuteLiteral, ModuleCode, SecondLiteral } from "../common";
+import { ActivityCode, ActivityTypeCode, ActivityTypeTitle, DatetimeLiteral, EventCode, HourLiteral, InstanceCode, MinuteLiteral, ModuleCode, SecondLiteral, TimeLiteral } from "../../common";
 import { RawRoom } from "./common";
 
 export interface RawEvent {
@@ -16,7 +16,7 @@ export interface RawEvent {
     type_code: ActivityTypeCode,
     allowed_planning_start: DatetimeLiteral,
     allowed_planning_end: DatetimeLiteral,
-    nb_hours: `${HourLiteral}:${MinuteLiteral}:${SecondLiteral}` | null,
+    nb_hours: TimeLiteral | null,
     nb_group: number,
     has_exam_subject: boolean,
     begin: DatetimeLiteral,

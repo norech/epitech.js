@@ -1,4 +1,4 @@
-import { DatetimeLiteral } from "../common";
+import { ActivityTypeTitle, DatetimeLiteral } from "../../common";
 
 export interface RawUserGroup {
     title: string,
@@ -15,7 +15,7 @@ export interface RawUserEvent {
 
 export interface RawUserGPA {
     gpa: `${number}`,
-    cycle: "bachelor" | "master"
+    cycle: string
 }
 
 export interface RawUserNSStat {
@@ -66,4 +66,50 @@ export interface RawUser {
     gpa: RawUserGPA,
     spice: any,
     nsstat: RawUserNSStat | null
+}
+
+export interface RawUserPartner {
+    login: string,
+    picture: string | null,
+    activities: string,
+    id_activities: string,
+    nb_activities: `${number}`,
+    weight: `${number}`
+}
+
+export interface RawUserPartnersOutput {
+    user: {
+        login: string,
+        picture: string | null,
+    },
+    binomes: RawUserPartner[]
+}
+
+export interface RawUserEducationalUpdate {
+    scolaryear: number,
+    date: DatetimeLiteral,
+    location: `${string}/${string}`,
+    promo: number,
+    course_code: string,
+    semester: number,
+    special: null,
+    modifier: string,
+    comment: string,
+    course_title: string
+}
+
+export interface RawUserAbsence {
+    module_title: string,
+    acti_title: string,
+    link_module: string,
+    link_event: string,
+    recent: "0" | "1",
+    begin: DatetimeLiteral,
+    end: DatetimeLiteral,
+    categ_title: ActivityTypeTitle
+}
+
+export interface RawUserAbsencesOutput {
+    recents: RawUserAbsence[],
+    others: RawUserAbsence[]
 }

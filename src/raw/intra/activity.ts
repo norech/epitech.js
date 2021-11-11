@@ -1,4 +1,4 @@
-import { ActivityCode, ActivityTypeCode, ActivityTypeTitle, DatetimeLiteral, EventCode, HourLiteral, InstanceCode, MinuteLiteral, ModuleCode, SecondLiteral, UserStatus } from "../common";
+import { ActivityCode, ActivityTypeCode, ActivityTypeTitle, DatetimeLiteral, EventCode, HourLiteral, InstanceCode, MinuteLiteral, ModuleCode, SecondLiteral, TimeLiteral, UserStatus } from "../../common";
 import { RawMember } from "./common";
 
 export interface RawActivityEvent {
@@ -19,12 +19,20 @@ export interface RawActivityEvent {
     assistants: RawMember[]
 }
 
+export interface RawActivityProject {
+    id: number,
+    scolaryear: `${number}`,
+    codemodule: ModuleCode,
+    codeinstance: InstanceCode,
+    title: string
+}
+
 export interface RawActivity {
     scolaryear: `${number}`,
     codemodule: ModuleCode,
     codeinstance: InstanceCode,
     codeacti: ActivityCode,
-    call_ihk: `${number}`,
+    call_ihk: `${number}` | null,
     slug: string | null,
     instance_location: string,
     module_title: string,
@@ -34,10 +42,10 @@ export interface RawActivity {
     type_code: ActivityTypeCode,
     begin: DatetimeLiteral,
     start: DatetimeLiteral,
-    end_register: DatetimeLiteral,
+    end_register: DatetimeLiteral | null,
     deadline: DatetimeLiteral | null,
     end: DatetimeLiteral,
-    nb_hours: `${HourLiteral}:${MinuteLiteral}:${SecondLiteral}` | null,
+    nb_hours: TimeLiteral | null,
     nb_group: number,
     num: number,
     register: "0" | "1",
@@ -45,8 +53,8 @@ export interface RawActivity {
     register_prof: "0" | "1",
     title_location_type: string | null,
     is_projet: boolean,
-    id_projet: `${number}`,
-    project_title: string,
+    id_projet: `${number}` | null,
+    project_title: string | null,
     is_note: boolean,
     nb_notes: number | null,
     is_blocins: boolean,

@@ -1,4 +1,4 @@
-import { InstanceCode, ModuleCode, ActivityCode, EventCode, HourLiteral, MinuteLiteral, SecondLiteral, ActivityTypeTitle, ActivityTypeCode, DatetimeLiteral, UserStatus } from "../common";
+import { InstanceCode, ModuleCode, ActivityCode, EventCode, HourLiteral, MinuteLiteral, SecondLiteral, ActivityTypeTitle, ActivityTypeCode, DatetimeLiteral, UserStatus, TimeLiteral } from "../../common";
 import { RawMember, RawRoom } from "./common";
 
 export interface RawPlanningElement {
@@ -8,7 +8,7 @@ export interface RawPlanningElement {
     codeacti: ActivityCode,
     codeevent: EventCode,
     semester: number,
-    instance_location: string,
+    instance_location: `${string}/${string}`,
     titlemodule: string,
     prof_inst: RawMember[] | null,
     acti_title: string,
@@ -20,7 +20,7 @@ export interface RawPlanningElement {
     type_title: ActivityTypeTitle,
     type_code: ActivityTypeCode,
     is_rdv: "0" | "1",
-    nb_hours: `${HourLiteral}:${MinuteLiteral}:${SecondLiteral}`,
+    nb_hours: TimeLiteral | null,
     allowed_planning_start: `${DatetimeLiteral}`,
     allowed_planning_end: `${DatetimeLiteral}`,
     nb_group: number,

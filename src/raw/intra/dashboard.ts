@@ -1,4 +1,4 @@
-import { DatetimeDMYLiteral, DateDMYLiteral, DatetimeLiteral, DayLiteral, Grade, HourLiteral, MinuteLiteral, ModuleCode, MonthLiteral, YearLiteral } from "../common";
+import { DatetimeDMYLiteral, DateDMYLiteral, DatetimeLiteral, DayLiteral, Grade, HourLiteral, MinuteLiteral, ModuleCode, MonthLiteral, YearLiteral } from "../../common";
 
 export interface RawDashboardProject {
     title: string,
@@ -67,12 +67,12 @@ export interface RawDashboardCurrentModule {
     credits_norm: `${number}`,
     credits_obj: `${number}`,
     credits: `${number}`,
-    grade: Grade,
+    grade: Grade | "-",
     cycle: string,
     code_module: ModuleCode,
     current_cycle: string,
     semester_code: string,
-    semester_num: `${string}`,
+    semester_num: `${number}`,
     active_log: any | null
 }
 
@@ -95,7 +95,7 @@ export interface RawDashboard {
         susies: any[],
         modules: RawDashboardModule[],
         stages: RawDashboardInternship[],
-        tickets?: any[]
+        tickets: any[]
     },
     history: RawDashboardHistory[],
     infos: {
