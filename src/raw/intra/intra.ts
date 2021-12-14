@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { ActivityCode, InstanceCode, ModuleCode } from "../../common";
 import { RawActivity } from "./activity";
 import { RawDashboard } from "./dashboard";
-import { RawCourseFilterOutput, RawModule, RawModuleBoardActivity, RawModuleRegisteredUser } from "./module";
+import { RawCourseFilterOutput, RawModule, RawModuleActivity, RawModuleActivityAppointment, RawModuleBoardActivity, RawModuleRegisteredUser } from "./module";
 import { RawPlanningElement } from "./planning";
 import { RawUser, RawUserAbsencesOutput, RawUserEducationalUpdate, RawUserPartnersOutput } from "./user";
 import cheerio from "cheerio";
@@ -189,14 +189,24 @@ export class RawIntra {
         return data;
     }
 
-    async getModuleByUrl(url: string): Promise<RawModule> {
+    async getModuleByUrl(url: ModuleUrl | string): Promise<RawModule> {
         url = this.solveUrl(url);
         const { data } = await this.request.get(url);
         return data;
     }
 
-    async getModuleRegistered(module: ModuleUrl): Promise<RawModuleRegisteredUser[]> {
-        const { data } = await this.request.get(module + "/registered");
+    async getModuleRegistered({ scolaryear, module, instance }: {
+        scolaryear: number | `${number}`;
+        module: ModuleCode;
+        instance: InstanceCode;
+    }): Promise<RawModuleRegisteredUser[]> {
+        const { data } = await this.request.get(`/module/${scolaryear}/${module}/${instance}/registered`);
+        return data;
+    }
+
+    async getModuleRegisteredByUrl(url: ModuleUrl | string): Promise<RawModuleRegisteredUser[]> {
+        url = this.solveUrl(url);
+        const { data } = await this.request.get(url + "/registered");
         return data;
     }
 
@@ -205,8 +215,14 @@ export class RawIntra {
         module: ModuleCode;
         instance: InstanceCode;
         activity: ActivityCode;
-    }): Promise<RawModule> {
+    }): Promise<RawActivity> {
         const { data } = await this.request.get(`/module/${scolaryear}/${module}/${instance}/${activity}/`);
+        return data;
+    }
+
+    async getActivityByUrl(url: string): Promise<RawActivity> {
+        url = this.solveUrl(url);
+        const { data } = await this.request.get(url);
         return data;
     }
 
@@ -215,14 +231,23 @@ export class RawIntra {
         module: ModuleCode;
         instance: InstanceCode;
         activity: ActivityCode;
-    }): Promise<RawModule> {
+    }): Promise<RawModuleActivityAppointment> {
         const { data } = await this.request.get(`/module/${scolaryear}/${module}/${instance}/${activity}/rdv/`);
         return data;
     }
 
-    async getActivityByUrl(url: string): Promise<RawActivity> {
-        url = this.solveUrl(url);
-        const { data } = await this.request.get(url);
+    async getActivityAppointmentsByUrl(url: ActivityUrl | string): Promise<RawModuleActivityAppointment> {
+        const { data } = await this.request.get(`${url}/rdv/`);
+        return data;
+    }
+
+    async getProject({ scolaryear, module, instance, activity }: {
+        scolaryear: number | `${number}`;
+        module: ModuleCode;
+        instance: InstanceCode;
+        activity: ActivityCode;
+    }): Promise<RawProject> {
+        const { data } = await this.request.get(`/module/${scolaryear}/${module}/${instance}/${activity}/project`);
         return data;
     }
 
@@ -235,18 +260,60 @@ export class RawIntra {
         return data;
     }
 
-    async getProjectRegistered(project: ProjectUrl): Promise<RawProjectRegisteredGroup[]> {
-        const { data } = await this.request.get(project + "/registered");
+    async getProjectRegistered({ scolaryear, module, instance, activity }: {
+        scolaryear: number | `${number}`;
+        module: ModuleCode;
+        instance: InstanceCode;
+        activity: ActivityCode;
+    }): Promise<RawProjectRegisteredGroup[]> {
+        const { data } = await this.request.get(`/module/${scolaryear}/${module}/${instance}/${activity}/project/registered`);
         return data;
     }
 
-    async getProjectUnregistered(project: ProjectUrl): Promise<string[]> {
-        const { data } = await this.request.get(project + "/exportunregistered");
+    async getProjectRegisteredByUrl(url: string): Promise<RawProjectRegisteredGroup[]> {
+        url = this.solveUrl(url);
+        if(!url.includes("/project")) { // Activity Url
+            url = url + "/project/";
+        }
+        const { data } = await this.request.get(url + "/registered");
+        return data;
+    }
+
+    async getProjectUnregistered({ scolaryear, module, instance, activity }: {
+        scolaryear: number | `${number}`;
+        module: ModuleCode;
+        instance: InstanceCode;
+        activity: ActivityCode;
+    }): Promise<RawProjectRegisteredGroup[]> {
+        const { data } = await this.request.get(`/module/${scolaryear}/${module}/${instance}/${activity}/project/exportunregistered`);
+        return data;
+    }
+
+    async getProjectUnregisteredByUrl(url: string): Promise<string[]> {
+        url = this.solveUrl(url);
+        if(!url.includes("/project")) { // Activity Url
+            url = url + "/project/";
+        }
+        const { data } = await this.request.get(url + "/exportunregistered");
         return data.split("\n");
     }
 
-    async getProjectFiles(project: ProjectUrl): Promise<RawProjectFile[]> {
-        const { data } = await this.request.get(project + "/file");
+    async getProjectFiles({ scolaryear, module, instance, activity }: {
+        scolaryear: number | `${number}`;
+        module: ModuleCode;
+        instance: InstanceCode;
+        activity: ActivityCode;
+    }): Promise<RawProjectFile[]> {
+        const { data } = await this.request.get(`/module/${scolaryear}/${module}/${instance}/${activity}/project/file`);
+        return data;
+    }
+
+    async getProjectFilesByUrl(url: string): Promise<RawProjectFile[]> {
+        url = this.solveUrl(url);
+        if(!url.includes("/project")) { // Activity Url
+            url = url + "/project/";
+        }
+        const { data } = await this.request.get(url + "/file");
         return data;
     }
 
@@ -255,12 +322,12 @@ export class RawIntra {
         return data.autologin;
     }
 
-    async registerProject(project: ProjectUrl): Promise<void> {
+    async registerProjectByUrl(project: ProjectUrl): Promise<void> {
         const { data } = await this.request.post(project + "/register", undefined);
         return data;
     }
 
-    async registerProjectGroup(project: ProjectUrl, { title, membersLogins }: {
+    async registerProjectGroupByUrl(project: ProjectUrl, { title, membersLogins }: {
         title: string,
         membersLogins: string[]
     }): Promise<void> {
@@ -274,7 +341,7 @@ export class RawIntra {
         return data;
     }
 
-    async destroyProjectGroup(project: ProjectUrl, groupCode?: string): Promise<void> {
+    async destroyProjectGroupByUrl(project: ProjectUrl, groupCode?: string): Promise<void> {
         if (groupCode === undefined) {
             const projectData = await this.getProjectByUrl(project);
             if (!projectData.user_project_code)
@@ -285,7 +352,7 @@ export class RawIntra {
         return data;
     }
 
-    async joinGroup(project: ProjectUrl, userLogin?: string): Promise<void> {
+    async joinGroupByUrl(project: ProjectUrl, userLogin?: string): Promise<void> {
         if (userLogin === undefined) {
             const user = await this.getUser();
             userLogin = user.login;
@@ -294,13 +361,13 @@ export class RawIntra {
         return data;
     }
 
-    async declineJoinGroup(project: ProjectUrl): Promise<void> {
+    async declineJoinGroupByUrl(project: ProjectUrl): Promise<void> {
 
         const { data } = await this.request.post(project + "/declinejoingroup", undefined);
         return data;
     }
 
-    async leaveGroup(project: ProjectUrl, userLogin?: string): Promise<void> {
+    async leaveGroupByUrl(project: ProjectUrl, userLogin?: string): Promise<void> {
         if (userLogin === undefined) {
             const user = await this.getUser();
             userLogin = user.login;

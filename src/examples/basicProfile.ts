@@ -1,4 +1,4 @@
-import { RawIntra } from "../";
+import { RawIntra } from "../";  // import { RawIntra } from "epitech.js";
 
 (async function(){
 
@@ -28,7 +28,7 @@ import { RawIntra } from "../";
             activity: projectActi.codeacti
         });
 
-        const projectFiles = await intra.getProjectFiles(projectUrl);
+        const projectFiles = await intra.getProjectFilesByUrl(projectUrl);
         console.log(projectFiles);
     }
 })();
