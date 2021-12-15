@@ -8,6 +8,7 @@ import { RawUser, RawUserAbsencesOutput, RawUserEducationalUpdate, RawUserPartne
 import cheerio from "cheerio";
 import { RawProject, RawProjectFile, RawProjectRegisteredGroup } from "./project";
 import { stringify } from "querystring";
+import { RawStagesOutput } from "./stage";
 
 export type ModuleUrl   = `/module/${number}/${ModuleCode}/${InstanceCode}/`
                         | `/module/${number}/${ModuleCode}/${InstanceCode}`;
@@ -314,6 +315,11 @@ export class RawIntra {
             url = url + "/project/";
         }
         const { data } = await this.request.get(url + "/file");
+        return data;
+    }
+
+    async getStages(): Promise<RawStagesOutput> {
+        const { data } = await this.request.get("/stage/load?format=json&offset=0&number=120");
         return data;
     }
 

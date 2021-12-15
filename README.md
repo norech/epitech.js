@@ -162,6 +162,10 @@ Get an array of files for the project.
 
 Get an array of files for the project by project or activity url.
 
+##### `getStages(): Promise<RawStagesOutput>`
+
+Get the internships for current user.
+
 ##### `getAutologin(): Promise<string>`
 
 Get autologin link for the current session.
