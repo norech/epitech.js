@@ -9,6 +9,7 @@ import cheerio from "cheerio";
 import { RawProject, RawProjectFile, RawProjectRegisteredGroup } from "./project";
 import { stringify } from "querystring";
 import { RawStagesOutput } from "./stage";
+import { esc } from ".";
 
 export type ModuleUrl   = `/module/${number}/${ModuleCode}/${InstanceCode}/`
                         | `/module/${number}/${ModuleCode}/${InstanceCode}`;
@@ -82,7 +83,7 @@ export class RawIntra {
         module: ModuleCode;
         instance: InstanceCode;
     }) {
-        return `/module/${scolaryear}/${module}/${instance}` as ModuleUrl;
+        return esc<ModuleUrl>`/module/${scolaryear}/${module}/${instance}`;
     }
 
     solveActivityUrl({ scolaryear, module, instance, activity }: {
@@ -91,7 +92,7 @@ export class RawIntra {
         instance: InstanceCode;
         activity: ActivityCode;
     }) {
-        return `/module/${scolaryear}/${module}/${instance}/${activity}` as ActivityUrl;
+        return esc<ActivityUrl>`/module/${scolaryear}/${module}/${instance}/${activity}`;
     }
 
     solveProjectUrl({ scolaryear, module, instance, activity }: {
@@ -100,7 +101,7 @@ export class RawIntra {
         instance: InstanceCode;
         activity: ActivityCode;
     }) {
-        return `/module/${scolaryear}/${module}/${instance}/${activity}/project` as ProjectUrl;
+        return esc<ProjectUrl>`/module/${scolaryear}/${module}/${instance}/${activity}/project`;
     }
 
     async getRequestProvider() {
@@ -114,19 +115,19 @@ export class RawIntra {
 
     async getUser(login?: string): Promise<RawUser> {
         login = login?.replace(/[?/#]+/g, "");
-        const { data } = await this.request.get(login ? `/user/${login}/` : `/user/`);
+        const { data } = await this.request.get(login ? esc`/user/${login}/` : `/user/`);
         return data;
     }
 
     async getUserNetsoul(login: string): Promise<[number, number, number, number, number, number][]> {
         login = login?.replace(/[?/#]+/g, "");
-        const { data } = await this.request.get(`/user/${login}/netsoul`);
+        const { data } = await this.request.get(esc`/user/${login}/netsoul`);
         return data;
     }
 
     async getUserPartners(login: string): Promise<RawUserPartnersOutput> {
         login = login?.replace(/[?/#]+/g, "");
-        const { data } = await this.request.get(`/user/${login}/binome`);
+        const { data } = await this.request.get(esc`/user/${login}/binome`);
         return data;
     }
 
@@ -149,7 +150,7 @@ export class RawIntra {
 
     async getUserAbsences(login: string): Promise<RawUserAbsencesOutput> {
         login = login?.replace(/[?/#]+/g, "");
-        const { data } = await this.request.get(`/user/${login}/notification/missed/`);
+        const { data } = await this.request.get(esc`/user/${login}/notification/missed/`);
         return data;
     }
 
@@ -160,14 +161,14 @@ export class RawIntra {
             const endDate = `${end.getFullYear()}-${end.getMonth() + 1}-${end.getDate()}`;
             query = `?start=${startDate}&end=${endDate}`;
         }
-        const { data } = await this.request.get(`/planning/load${query}`);
+        const { data } = await this.request.get(esc`/planning/load${query}`);
         return data;
     }
 
     async getModuleBoard(start: Date, end: Date): Promise<RawModuleBoardActivity[]> {
         const startDate = `${start.getFullYear()}-${start.getMonth() + 1}-${start.getDate()}`;
         const endDate = `${end.getFullYear()}-${end.getMonth() + 1}-${end.getDate()}`;
-        const { data } = await this.request.get(`/module/board/?start=${startDate}&end=${endDate}`);
+        const { data } = await this.request.get(esc`/module/board/?start=${startDate}&end=${endDate}`);
         return data;
     }
 
@@ -177,7 +178,7 @@ export class RawIntra {
         const courseString = filter.courses?.map(v => "course[]=" + v.replace(/[&=]+/g, "")).join("&");
         const scolaryearString = filter.scolaryears?.map(v => "course[]=" + v).join("&");
         const filterString = [preload, locationString, courseString, scolaryearString].filter(s => s != undefined).join("&");
-        const { data } = await this.request.get(`/course/filter?` + filterString);
+        const { data } = await this.request.get(esc`/course/filter?` + filterString);
         return data;
     }
 
@@ -186,7 +187,7 @@ export class RawIntra {
         module: ModuleCode;
         instance: InstanceCode;
     }): Promise<RawModule> {
-        const { data } = await this.request.get(`/module/${scolaryear}/${module}/${instance}/`);
+        const { data } = await this.request.get(esc`/module/${scolaryear}/${module}/${instance}/`);
         return data;
     }
 
@@ -201,7 +202,7 @@ export class RawIntra {
         module: ModuleCode;
         instance: InstanceCode;
     }): Promise<RawModuleRegisteredUser[]> {
-        const { data } = await this.request.get(`/module/${scolaryear}/${module}/${instance}/registered`);
+        const { data } = await this.request.get(esc`/module/${scolaryear}/${module}/${instance}/registered`);
         return data;
     }
 
@@ -217,7 +218,7 @@ export class RawIntra {
         instance: InstanceCode;
         activity: ActivityCode;
     }): Promise<RawActivity> {
-        const { data } = await this.request.get(`/module/${scolaryear}/${module}/${instance}/${activity}/`);
+        const { data } = await this.request.get(esc`/module/${scolaryear}/${module}/${instance}/${activity}/`);
         return data;
     }
 
@@ -233,12 +234,12 @@ export class RawIntra {
         instance: InstanceCode;
         activity: ActivityCode;
     }): Promise<RawModuleActivityAppointment> {
-        const { data } = await this.request.get(`/module/${scolaryear}/${module}/${instance}/${activity}/rdv/`);
+        const { data } = await this.request.get(esc`/module/${scolaryear}/${module}/${instance}/${activity}/rdv/`);
         return data;
     }
 
     async getActivityAppointmentsByUrl(url: ActivityUrl | string): Promise<RawModuleActivityAppointment> {
-        const { data } = await this.request.get(`${url}/rdv/`);
+        const { data } = await this.request.get(esc`${url}/rdv/`);
         return data;
     }
 
@@ -248,7 +249,7 @@ export class RawIntra {
         instance: InstanceCode;
         activity: ActivityCode;
     }): Promise<RawProject> {
-        const { data } = await this.request.get(`/module/${scolaryear}/${module}/${instance}/${activity}/project`);
+        const { data } = await this.request.get(esc`/module/${scolaryear}/${module}/${instance}/${activity}/project`);
         return data;
     }
 
@@ -267,7 +268,7 @@ export class RawIntra {
         instance: InstanceCode;
         activity: ActivityCode;
     }): Promise<RawProjectRegisteredGroup[]> {
-        const { data } = await this.request.get(`/module/${scolaryear}/${module}/${instance}/${activity}/project/registered`);
+        const { data } = await this.request.get(esc`/module/${scolaryear}/${module}/${instance}/${activity}/project/registered`);
         return data;
     }
 
@@ -286,7 +287,7 @@ export class RawIntra {
         instance: InstanceCode;
         activity: ActivityCode;
     }): Promise<RawProjectRegisteredGroup[]> {
-        const { data } = await this.request.get(`/module/${scolaryear}/${module}/${instance}/${activity}/project/exportunregistered`);
+        const { data } = await this.request.get(esc`/module/${scolaryear}/${module}/${instance}/${activity}/project/exportunregistered`);
         return data;
     }
 
@@ -305,7 +306,7 @@ export class RawIntra {
         instance: InstanceCode;
         activity: ActivityCode;
     }): Promise<RawProjectFile[]> {
-        const { data } = await this.request.get(`/module/${scolaryear}/${module}/${instance}/${activity}/project/file`);
+        const { data } = await this.request.get(esc`/module/${scolaryear}/${module}/${instance}/${activity}/project/file`);
         return data;
     }
 

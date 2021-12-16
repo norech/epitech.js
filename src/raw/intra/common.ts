@@ -10,6 +10,10 @@ export function isLiteralFalse(value: any): value is LiteralFalse {
     return value === "0" || value === "false" || value === 0 || value === false || value == null;
 }
 
+export function esc<T extends string = string>(strs: TemplateStringsArray, ...args: any[]) {
+    return strs.map(str => str + (args.length > 0 ? encodeURIComponent(args.shift()) : "")).join('') as T;
+}
+
 export interface RawGroup {
     type: "group",
     login: string
