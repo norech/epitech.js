@@ -239,7 +239,7 @@ export class RawIntra {
     }
 
     async getActivityAppointmentsByUrl(url: ActivityUrl | string): Promise<RawModuleActivityAppointment> {
-        const { data } = await this.request.get(esc`${url}/rdv/`);
+        const { data } = await this.request.get(`${url}/rdv/`);
         return data;
     }
 
