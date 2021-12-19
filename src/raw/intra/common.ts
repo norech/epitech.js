@@ -7,7 +7,7 @@ export function isLiteralTrue(value: any): value is LiteralTrue {
 }
 
 export function isLiteralFalse(value: any): value is LiteralFalse {
-    return value === "0" || value === "false" || value === 0 || value === false || value == null;
+    return value === "0" || value === "false" || value === 0 || value === false || value === null;
 }
 
 export function esc<T extends string = string>(strs: TemplateStringsArray, ...args: any[]) {
