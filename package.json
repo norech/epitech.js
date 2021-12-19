@@ -4,9 +4,12 @@
     "epitech",
     "intra",
     "api",
-    "wrapper"
+    "wrapper",
+    "typescript",
+    "types",
+    "intranet"
   ],
-  "version": "0.1.1",
+  "version": "0.1.4",
   "description": "Library to interact with the Epitech intranet",
   "main": "out/index.js",
   "scripts": {
