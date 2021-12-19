@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { ActivityCode, InstanceCode, ModuleCode } from "../../common";
 import { RawActivity } from "./activity";
 import { RawDashboard } from "./dashboard";
-import { RawCourseFilterOutput, RawModule, RawModuleActivity, RawModuleActivityAppointment, RawModuleBoardActivity, RawModuleRegisteredUser } from "./module";
+import { RawCourseFilterOutput, RawModule, RawModuleActivityAppointment, RawModuleBoardActivity, RawModuleRegisteredUser } from "./module";
 import { RawPlanningElement } from "./planning";
 import { RawUser, RawUserAbsencesOutput, RawUserEducationalUpdate, RawUserPartnersOutput } from "./user";
 import cheerio from "cheerio";
@@ -10,15 +10,7 @@ import { RawProject, RawProjectFile, RawProjectRegisteredGroup } from "./project
 import { stringify } from "querystring";
 import { RawStagesOutput } from "./stage";
 import { esc } from ".";
-
-export type ModuleUrl   = `/module/${number}/${ModuleCode}/${InstanceCode}/`
-                        | `/module/${number}/${ModuleCode}/${InstanceCode}`;
-
-export type ActivityUrl = `${ModuleUrl}/${ActivityCode}`
-                        | `${ModuleUrl}/${ActivityCode}/`;
-
-export type ProjectUrl  = `${ActivityUrl}/project`
-                        | `${ActivityUrl}/project/`;
+import { isActivityUrl, isModuleUrl, isProjectUrl, UrlPathType, ActivityUrl, ModuleUrl, ProjectUrl } from "./url";
 
 export class IntraRequestProvider {
     protected endpoint = "https://intra.epitech.eu/";
@@ -65,7 +57,7 @@ export class RawIntra {
         this.request = new IntraRequestProvider(config.autologin);
     }
 
-    solveUrl(url: string) {
+    solveUrl(url: string, validTypes: UrlPathType[] = ["all"]) {
         if (url.startsWith("/"))
             url = "https://intra.epitech.eu" + url;
         const uri = new URL(url);
@@ -75,7 +67,21 @@ export class RawIntra {
         if (pathname.startsWith("/auth-") && i !== -1) { // autologin link
             pathname = pathname.slice(i - 1);
         }
-        return pathname;
+
+        if (validTypes.indexOf("all") !== -1)
+            return pathname;
+
+        if (validTypes.indexOf("module") !== -1 && isModuleUrl(pathname))
+            return pathname as ModuleUrl;
+        if (validTypes.indexOf("activity") !== -1 && isActivityUrl(pathname))
+            return pathname as ActivityUrl;
+        if (validTypes.indexOf("project") !== -1 && isProjectUrl(pathname))
+            return pathname as ProjectUrl;
+
+        if (validTypes.indexOf("project") !== -1 && isActivityUrl(pathname))
+            return (pathname + "/project/") as ProjectUrl;
+        
+        throw new Error("Unexpected path: " + pathname + ". Expected path type: " + validTypes.join(", "));
     }
 
     solveModuleUrl({ scolaryear, module, instance }: {
@@ -192,7 +198,7 @@ export class RawIntra {
     }
 
     async getModuleByUrl(url: ModuleUrl | string): Promise<RawModule> {
-        url = this.solveUrl(url);
+        url = this.solveUrl(url, ["module"]);
         const { data } = await this.request.get(url);
         return data;
     }
@@ -207,7 +213,7 @@ export class RawIntra {
     }
 
     async getModuleRegisteredByUrl(url: ModuleUrl | string): Promise<RawModuleRegisteredUser[]> {
-        url = this.solveUrl(url);
+        url = this.solveUrl(url, ["module"]);
         const { data } = await this.request.get(url + "/registered");
         return data;
     }
@@ -223,7 +229,7 @@ export class RawIntra {
     }
 
     async getActivityByUrl(url: string): Promise<RawActivity> {
-        url = this.solveUrl(url);
+        url = this.solveUrl(url, ["activity"]);
         const { data } = await this.request.get(url);
         return data;
     }
@@ -239,6 +245,7 @@ export class RawIntra {
     }
 
     async getActivityAppointmentsByUrl(url: ActivityUrl | string): Promise<RawModuleActivityAppointment> {
+        url = this.solveUrl(url, ["activity"]);
         const { data } = await this.request.get(`${url}/rdv/`);
         return data;
     }
@@ -254,10 +261,7 @@ export class RawIntra {
     }
 
     async getProjectByUrl(url: string): Promise<RawProject> {
-        url = this.solveUrl(url);
-        if(!url.includes("/project")) { // Activity Url
-            url = url + "/project/";
-        }
+        url = this.solveUrl(url, ["project"]);
         const { data } = await this.request.get(url);
         return data;
     }
@@ -273,10 +277,7 @@ export class RawIntra {
     }
 
     async getProjectRegisteredByUrl(url: string): Promise<RawProjectRegisteredGroup[]> {
-        url = this.solveUrl(url);
-        if(!url.includes("/project")) { // Activity Url
-            url = url + "/project/";
-        }
+        url = this.solveUrl(url, ["project"]);
         const { data } = await this.request.get(url + "/registered");
         return data;
     }
@@ -292,10 +293,7 @@ export class RawIntra {
     }
 
     async getProjectUnregisteredByUrl(url: string): Promise<string[]> {
-        url = this.solveUrl(url);
-        if(!url.includes("/project")) { // Activity Url
-            url = url + "/project/";
-        }
+        url = this.solveUrl(url, ["project"]);
         const { data } = await this.request.get(url + "/exportunregistered");
         return data.split("\n");
     }
@@ -310,12 +308,9 @@ export class RawIntra {
         return data;
     }
 
-    async getProjectFilesByUrl(url: string): Promise<RawProjectFile[]> {
-        url = this.solveUrl(url);
-        if(!url.includes("/project")) { // Activity Url
-            url = url + "/project/";
-        }
-        const { data } = await this.request.get(url + "/file");
+    async getProjectFilesByUrl(projectUrl: string): Promise<RawProjectFile[]> {
+        projectUrl = this.solveUrl(projectUrl, ["project"]);
+        const { data } = await this.request.get(projectUrl + "/file");
         return data;
     }
 
@@ -329,16 +324,20 @@ export class RawIntra {
         return data.autologin;
     }
 
-    async registerProjectByUrl(project: ProjectUrl): Promise<void> {
-        const { data } = await this.request.post(project + "/register", undefined);
+    async registerProjectByUrl(projectUrl: string): Promise<void> {
+        projectUrl = this.solveUrl(projectUrl, ["project"]);
+
+        const { data } = await this.request.post(projectUrl + "/register", undefined);
         return data;
     }
 
-    async registerProjectGroupByUrl(project: ProjectUrl, { title, membersLogins }: {
+    async registerProjectGroupByUrl(projectUrl: string, { title, membersLogins }: {
         title: string,
         membersLogins: string[]
     }): Promise<void> {
-        const { data } = await this.request.post(project + "/register", {
+        projectUrl = this.solveUrl(projectUrl, ["project"]);
+
+        const { data } = await this.request.post(projectUrl + "/register", {
             codegroup: undefined,
             members: membersLogins,
             title,
@@ -348,38 +347,45 @@ export class RawIntra {
         return data;
     }
 
-    async destroyProjectGroupByUrl(project: ProjectUrl, groupCode?: string): Promise<void> {
+    async destroyProjectGroupByUrl(projectUrl: string, groupCode?: string): Promise<void> {
+        projectUrl = this.solveUrl(projectUrl, ["project"]);
+
         if (groupCode === undefined) {
-            const projectData = await this.getProjectByUrl(project);
+            const projectData = await this.getProjectByUrl(projectUrl);
             if (!projectData.user_project_code)
                 throw new Error("User does not have a group");
             groupCode = projectData.user_project_code;
         }
-        const { data } = await this.request.post(project + "/destroygroup", { code: groupCode });
+        const { data } = await this.request.post(projectUrl + "/destroygroup", { code: groupCode });
         return data;
     }
 
-    async joinGroupByUrl(project: ProjectUrl, userLogin?: string): Promise<void> {
+    async joinGroupByUrl(projectUrl: string, userLogin?: string): Promise<void> {
+        projectUrl = this.solveUrl(projectUrl, ["project"]);
+
         if (userLogin === undefined) {
             const user = await this.getUser();
             userLogin = user.login;
         }
-        const { data } = await this.request.post(project + "/confirmjoingroup", { login: userLogin });
+        const { data } = await this.request.post(projectUrl + "/confirmjoingroup", { login: userLogin });
         return data;
     }
 
-    async declineJoinGroupByUrl(project: ProjectUrl): Promise<void> {
+    async declineJoinGroupByUrl(projectUrl: string): Promise<void> {
+        projectUrl = this.solveUrl(projectUrl, ["project"]);
 
-        const { data } = await this.request.post(project + "/declinejoingroup", undefined);
+        const { data } = await this.request.post(projectUrl + "/declinejoingroup", undefined);
         return data;
     }
 
-    async leaveGroupByUrl(project: ProjectUrl, userLogin?: string): Promise<void> {
+    async leaveGroupByUrl(projectUrl: string, userLogin?: string): Promise<void> {
+        projectUrl = this.solveUrl(projectUrl, ["project"]);
+
         if (userLogin === undefined) {
             const user = await this.getUser();
             userLogin = user.login;
         }
-        const { data } = await this.request.post(project + "/confirmleavegroup", { login: userLogin });
+        const { data } = await this.request.post(projectUrl + "/confirmleavegroup", { login: userLogin });
         return data;
     }
 }

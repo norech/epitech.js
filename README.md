@@ -198,9 +198,17 @@ Make the specified user leave a project group by project url.
 
 If user login is not specified, current user login is used. Additional permissions might be required if user login is not the current user.
 
-##### `solveUrl(url: string): string`
+##### `solveUrl(url: string, validTypes: string[] = ["all"]): string`
 
-Get the underlying route from specified intranet URL. Mainly used internally.
+Get the underlying route from specified intranet URL. Will strip the autologin part if present.
+
+Valid types: `"all", "module", "project", "activity"`.
+
+Unless `"all"` is specified in the valid types, path checks will be performed.
+
+In case of no match with any valid types provided, if possible, a path transformation will be attempted (e.g. `activity` -> `project`).
+
+If url doesn't match any valid types and the path transformation fails, an error is thrown.
 
 ##### `solveModuleUrl({ scolaryear, module, instance }): ActivityUrl`
 
