@@ -57,7 +57,7 @@ export class RawIntra {
         this.request = new IntraRequestProvider(config.autologin);
     }
 
-    solveUrl(url: string, validTypes: UrlPathType[] = ["all"]) {
+    solveUrl(url: string, validTypes: UrlPathType[] = ["all"]): string {
         if (url.startsWith("/"))
             url = "https://intra.epitech.eu" + url;
         const uri = new URL(url);
@@ -65,7 +65,7 @@ export class RawIntra {
         let i = pathname.indexOf("/", 1);
 
         if (pathname.startsWith("/auth-") && i !== -1) { // autologin link
-            pathname = pathname.slice(i - 1);
+            pathname = pathname.slice(i);
         }
 
         if (validTypes.indexOf("all") !== -1)
@@ -80,7 +80,16 @@ export class RawIntra {
 
         if (validTypes.indexOf("project") !== -1 && isActivityUrl(pathname))
             return (pathname + "/project/") as ProjectUrl;
-        
+
+        try {
+            const lastSlash = pathname.lastIndexOf("/");
+            if (lastSlash > 0) {
+                return this.solveUrl(pathname.slice(0, lastSlash), validTypes);
+            }
+        } catch (e) {
+            // well, in either case, it will be an invalid path error
+        }
+
         throw new Error("Unexpected path: " + pathname + ". Expected path type: " + validTypes.join(", "));
     }
 
