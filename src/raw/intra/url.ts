@@ -34,9 +34,10 @@ export type SolvedUrl<T extends UrlPathType[]> = T extends (infer R)[]
     : never /*gonna give you up*/
     : never /*gonna let you down*/;
 
-type IncludesPathType<T extends string[], U extends UrlPathType>
-    = T extends (infer R)[] ? R extends U ? true : false : false;
+type IncludesPathType<T extends UrlPathType[], U extends UrlPathType>
+    = T[number] extends U ? true : false;
 
-export function includesPathType<T extends string[], U extends UrlPathType>(pathTypes: T, pathType: U): IncludesPathType<T, U> {
-    return (pathTypes.indexOf(pathType) !== -1) as IncludesPathType<T, U>;
+export function includesPathType<T extends UrlPathType[], U extends UrlPathType>(
+    pathTypes: T, pathType: U): IncludesPathType<T, U> {
+        return (pathTypes.indexOf(pathType) !== -1) as IncludesPathType<T, U>;
 }
