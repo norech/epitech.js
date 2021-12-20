@@ -22,3 +22,17 @@ export function isProjectUrl(str: string): str is ProjectUrl {
 export function isActivityUrl(str: string): str is ActivityUrl {
     return /^\/module\/[0-9]{4}\/[A-Z]-[A-Z]{3}-[0-9]{3}\/[A-Z]{3}-[0-9]+-[0-9]+\/acti-[0-9]+[\/]?$/.test(str);
 }
+
+type ExcludeArrayElement<T extends string[], U> = T[number] extends U ? never : T;
+
+export type SolvedUrl<T extends UrlPathType[]> = T[number] extends "all" ? string
+    : T[number] extends "project" ? ProjectUrl | SolvedUrl<ExcludeArrayElement<T, "project">>
+    : T[number] extends "module" ? ModuleUrl | SolvedUrl<ExcludeArrayElement<T, "module">>
+    : T[number] extends "activity" ? ActivityUrl | SolvedUrl<ExcludeArrayElement<T, "activity">>
+    : never;
+
+type IncludesPathType<T extends string[], U extends UrlPathType> = T[number] extends U ? true : false;
+
+export function includesPathType<T extends string[], U extends UrlPathType>(pathTypes: T, pathType: U): IncludesPathType<T, U> {
+    return (pathTypes.indexOf(pathType) !== -1) as IncludesPathType<T, U>;
+}

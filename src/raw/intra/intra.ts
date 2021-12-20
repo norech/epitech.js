@@ -9,8 +9,8 @@ import cheerio from "cheerio";
 import { RawProject, RawProjectFile, RawProjectRegisteredGroup } from "./project";
 import { stringify } from "querystring";
 import { RawStagesOutput } from "./stage";
-import { esc } from ".";
-import { isActivityUrl, isModuleUrl, isProjectUrl, UrlPathType, ActivityUrl, ModuleUrl, ProjectUrl } from "./url";
+import { esc, SolvedUrl } from ".";
+import { isActivityUrl, isModuleUrl, isProjectUrl, includesPathType, UrlPathType, ActivityUrl, ModuleUrl, ProjectUrl } from "./url";
 
 export class IntraRequestProvider {
     protected endpoint = "https://intra.epitech.eu/";
@@ -57,7 +57,7 @@ export class RawIntra {
         this.request = new IntraRequestProvider(config.autologin);
     }
 
-    solveUrl(url: string, validTypes: UrlPathType[] = ["all"]): string {
+    solveUrl<T extends UrlPathType[]>(url: string, validTypes?: T): SolvedUrl<T> {
         if (url.startsWith("/"))
             url = "https://intra.epitech.eu" + url;
         const uri = new URL(url);
@@ -68,23 +68,23 @@ export class RawIntra {
             pathname = pathname.slice(i);
         }
 
-        if (validTypes.indexOf("all") !== -1)
-            return pathname;
+        if (!validTypes || includesPathType(validTypes, "all"))
+            return pathname as SolvedUrl<T>;
 
-        if (validTypes.indexOf("module") !== -1 && isModuleUrl(pathname))
-            return pathname as ModuleUrl;
-        if (validTypes.indexOf("activity") !== -1 && isActivityUrl(pathname))
-            return pathname as ActivityUrl;
-        if (validTypes.indexOf("project") !== -1 && isProjectUrl(pathname))
-            return pathname as ProjectUrl;
+        if (includesPathType(validTypes, "module") && isModuleUrl(pathname))
+            return pathname as SolvedUrl<T>;
+        if (includesPathType(validTypes, "activity") && isActivityUrl(pathname))
+            return pathname as SolvedUrl<T>;
+        if (includesPathType(validTypes, "project") && isProjectUrl(pathname))
+            return pathname as SolvedUrl<T>;
 
-        if (validTypes.indexOf("project") !== -1 && isActivityUrl(pathname))
-            return (pathname + "/project/") as ProjectUrl;
+        if (includesPathType(validTypes, "project") && isActivityUrl(pathname))
+            return (pathname + "/project/")  as SolvedUrl<T>;
 
         try {
             const lastSlash = pathname.lastIndexOf("/");
             if (lastSlash > 0) {
-                return this.solveUrl(pathname.slice(0, lastSlash), validTypes);
+                return this.solveUrl<T>(pathname.slice(0, lastSlash), validTypes);
             }
         } catch (e) {
             // well, in either case, it will be an invalid path error
