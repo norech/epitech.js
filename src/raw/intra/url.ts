@@ -31,8 +31,8 @@ export type SolvedUrl<T extends UrlPathType[]> = T extends (infer R)[]
     : R extends "project" ? ProjectUrl | SolvedUrl<ExcludeArrayElement<T, "project">>
     : R extends "module" ? ModuleUrl | SolvedUrl<ExcludeArrayElement<T, "module">>
     : R extends "activity" ? ActivityUrl | SolvedUrl<ExcludeArrayElement<T, "activity">>
-    : never
-    : never;
+    : never /*gonna give you up*/
+    : never /*gonna let you down*/;
 
 type IncludesPathType<T extends string[], U extends UrlPathType>
     = T extends (infer R)[] ? R extends U ? true : false : false;
