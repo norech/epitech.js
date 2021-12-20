@@ -57,7 +57,7 @@ export class RawIntra {
         this.request = new IntraRequestProvider(config.autologin);
     }
 
-    solveUrl<T extends UrlPathType[]>(url: string, validTypes?: T): SolvedUrl<T> {
+    solveUrl<T extends UrlPathType[]>(url: string, validTypes?: T | undefined): SolvedUrl<T> {
         if (url.startsWith("/"))
             url = "https://intra.epitech.eu" + url;
         const uri = new URL(url);

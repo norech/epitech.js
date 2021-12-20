@@ -23,15 +23,19 @@ export function isActivityUrl(str: string): str is ActivityUrl {
     return /^\/module\/[0-9]{4}\/[A-Z]-[A-Z]{3}-[0-9]{3}\/[A-Z]{3}-[0-9]+-[0-9]+\/acti-[0-9]+[\/]?$/.test(str);
 }
 
-type ExcludeArrayElement<T extends string[], U> = T[number] extends U ? never : T;
+type ExcludeArrayElement<T extends string[], U>
+    = T extends (infer R)[] ? R extends U ? never : R[] : never;
 
-export type SolvedUrl<T extends UrlPathType[]> = T[number] extends "all" ? string
-    : T[number] extends "project" ? ProjectUrl | SolvedUrl<ExcludeArrayElement<T, "project">>
-    : T[number] extends "module" ? ModuleUrl | SolvedUrl<ExcludeArrayElement<T, "module">>
-    : T[number] extends "activity" ? ActivityUrl | SolvedUrl<ExcludeArrayElement<T, "activity">>
+export type SolvedUrl<T extends UrlPathType[]> = T extends (infer R)[]
+    ? R extends "all" ? string
+    : R extends "project" ? ProjectUrl | SolvedUrl<ExcludeArrayElement<T, "project">>
+    : R extends "module" ? ModuleUrl | SolvedUrl<ExcludeArrayElement<T, "module">>
+    : R extends "activity" ? ActivityUrl | SolvedUrl<ExcludeArrayElement<T, "activity">>
+    : never
     : never;
 
-type IncludesPathType<T extends string[], U extends UrlPathType> = T[number] extends U ? true : false;
+type IncludesPathType<T extends string[], U extends UrlPathType>
+    = T extends (infer R)[] ? R extends U ? true : false : false;
 
 export function includesPathType<T extends string[], U extends UrlPathType>(pathTypes: T, pathType: U): IncludesPathType<T, U> {
     return (pathTypes.indexOf(pathType) !== -1) as IncludesPathType<T, U>;
