@@ -179,9 +179,9 @@ export class RawIntra {
         if (start && end) {
             const startDate = `${start.getFullYear()}-${start.getMonth() + 1}-${start.getDate()}`;
             const endDate = `${end.getFullYear()}-${end.getMonth() + 1}-${end.getDate()}`;
-            query = `?start=${startDate}&end=${endDate}`;
+            query = esc`?start=${startDate}&end=${endDate}`;
         }
-        const { data } = await this.request.get(esc`/planning/load${query}`);
+        const { data } = await this.request.get(`/planning/load${query}`);
         return data;
     }
 
@@ -196,11 +196,22 @@ export class RawIntra {
 
     async filterCourses(filter: RawCourseFilters): Promise<RawCourseFilterOutput> {
         const preload = "preload=" + (filter.preload ? "1" : "0");
-        const locationString = filter.locations?.map(v => "location[]=" + v.replace(/[&=]+/g, "")).join("&");
-        const courseString = filter.courses?.map(v => "course[]=" + v.replace(/[&=]+/g, "")).join("&");
-        const scolaryearString = filter.scolaryears?.map(v => "course[]=" + v).join("&");
-        const filterString = [preload, locationString, courseString, scolaryearString].filter(s => s != undefined).join("&");
-        const { data } = await this.request.get(esc`/course/filter?` + filterString);
+
+        const locationString = filter.locations
+            ?.map(v => esc`location[]=${v}`).join("&");
+
+        const courseString = filter.courses
+            ?.map(v => esc`course[]=${v}`).join("&");
+
+        const scolaryearString = filter.scolaryears
+            ?.map(v => esc`scolaryear[]=${v}`).join("&");
+
+        const filterString = [
+            preload, locationString, courseString, scolaryearString
+        ].filter(s => s != undefined).join("&");
+
+        const { data } = await this.request.get(`/course/filter?${filterString}`);
+
         return data;
     }
 
