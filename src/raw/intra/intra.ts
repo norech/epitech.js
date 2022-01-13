@@ -371,6 +371,24 @@ export class RawIntra {
         return data.autologin;
     }
 
+    async registerActivityByUrl(activityUrl: string): Promise<void> {
+        activityUrl = this.solveUrl(activityUrl, ["activity"]);
+
+        const { data } = await this.request.post(
+            activityUrl + "/register", undefined
+        );
+        return data;
+    }
+
+    async unregisterActivityByUrl(activityUrl: string): Promise<void> {
+        activityUrl = this.solveUrl(activityUrl, ["activity"]);
+
+        const { data } = await this.request.post(
+            activityUrl + "/unregister", undefined
+        );
+        return data;
+    }
+
     async registerProjectByUrl(projectUrl: string): Promise<void> {
         projectUrl = this.solveUrl(projectUrl, ["project"]);
 
