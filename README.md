@@ -31,6 +31,35 @@ const intra = new RawIntra({
 });
 ```
 
+### Raw classes (bindings)
+
+Here is a table matching each method of the raw classes and the corresponding endpoint:
+
+#### RawIntra (`intra.epitech.eu`)
+
+| Binding                        | Endpoint                                                       |
+|--------------------------------|----------------------------------------------------------------|
+| `getDashboard`                 | `/`                                                            |
+| `getUser`                      | `/user/:user` or `/user`                                       |
+| `getUserNetsoul`               | `/user/:user/netsoul`                                          |
+| `getUserPartners`              | `/user/:user/binome`                                           |
+| `getUserEducationalOverview`   | none (scraped from `/user/:user/#!/pedago`)                    |
+| `getUserAbsences`              | `/user/:user/absences`                                         |
+| `getPlanning`                  | `/planning/load`                                               |
+| `getModuleBoard`               | `/module/board`                                                |
+| `filterCourses`                | `/course/filter`                                               |
+| `getModule`                    | `/module/:year/:module/:instance`                              |
+| `getModuleRegistered`          | `/module/:year/:module/:instance/registered`                   |
+| `getActivity`                  | `/module/:year/:module/:instance/:activity`                    |
+| `getActivityAppointments`      | `/module/:year/:module/:instance/:activity/rdv`                |
+| `getProject`                   | `/module/:year/:module/:instance/:activity/project`            |
+| `getProjectRegistered`         | `/module/:year/:mod/:ins/:act/project/registered`              |
+| `getProjectUnregistered`       | `/module/:year/:mod/:ins/:act/project/exportunregistered`      |
+| `getProjectFiles`              | `/module/:year/:mod/:ins/:act/project/files`                   |
+| `getStages`                    | `/stage`                                                       |
+| `getAutologin`                 | `/admin/autologin`                                             |
+
+
 ### Classes
 
 #### `RawIntra`
@@ -118,7 +147,7 @@ Get the registered users for a module by module url.
 
 Get the activity informations.
 
-##### `getActivity(url): Promise<RawActivity>`
+##### `getActivityByUrl(url): Promise<RawActivity>`
 
 Get the activity informations by activity url.
 
@@ -130,11 +159,11 @@ Get the activity appointments (rdv).
 
 Get the activity appointments (rdv) by activity url.
 
-##### `getProject({ scolaryear, module, instance, activity }): Promise<RawModuleActivityAppointment>`
+##### `getProject({ scolaryear, module, instance, activity }): Promise<RawProject>`
 
 Get the project.
 
-##### `getProjectByUrl(url): Promise<RawModuleActivityAppointment>`
+##### `getProjectByUrl(url): Promise<RawProject>`
 
 Get the project by project or activity url.
 
