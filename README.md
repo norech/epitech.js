@@ -208,6 +208,14 @@ Get the internships for current user.
 
 Get autologin link for the current session.
 
+##### `registerEventByUrl(eventUrl): Promise<void>`
+
+Register to event by event url.
+
+##### `unregisterEventByUrl(eventUrl): Promise<void>`
+
+Unregister to event by event url.
+
 ##### `registerProjectByUrl(projectUrl): Promise<void>`
 
 Register to project by project url.
