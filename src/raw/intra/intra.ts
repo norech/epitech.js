@@ -9,7 +9,7 @@ import cheerio from "cheerio";
 import { RawProject, RawProjectFile, RawProjectRegisteredGroup } from "./project";
 import { stringify } from "querystring";
 import { RawStagesOutput } from "./stage";
-import { esc, SolvedUrl } from ".";
+import { esc, isEventUrl, SolvedUrl } from ".";
 import { isActivityUrl, isModuleUrl, isProjectUrl, includesPathType, UrlPathType, ActivityUrl, ModuleUrl, ProjectUrl } from "./url";
 
 export class IntraRequestProvider {
@@ -76,6 +76,8 @@ export class RawIntra {
         if (includesPathType(validTypes, "activity") && isActivityUrl(pathname))
             return pathname as SolvedUrl<T>;
         if (includesPathType(validTypes, "project") && isProjectUrl(pathname))
+            return pathname as SolvedUrl<T>;
+        if (includesPathType(validTypes, "event") && isEventUrl(pathname))
             return pathname as SolvedUrl<T>;
 
         if (includesPathType(validTypes, "project") && isActivityUrl(pathname))
@@ -371,20 +373,20 @@ export class RawIntra {
         return data.autologin;
     }
 
-    async registerActivityByUrl(activityUrl: string): Promise<void> {
-        activityUrl = this.solveUrl(activityUrl, ["activity"]);
+    async registerEventByUrl(eventUrl: string): Promise<void> {
+        eventUrl = this.solveUrl(eventUrl, ["event"]);
 
         const { data } = await this.request.post(
-            activityUrl + "/register", undefined
+            eventUrl + "/register", undefined
         );
         return data;
     }
 
-    async unregisterActivityByUrl(activityUrl: string): Promise<void> {
-        activityUrl = this.solveUrl(activityUrl, ["activity"]);
+    async unregisterEventByUrl(eventUrl: string): Promise<void> {
+        eventUrl = this.solveUrl(eventUrl, ["event"]);
 
         const { data } = await this.request.post(
-            activityUrl + "/unregister", undefined
+            eventUrl + "/unregister", undefined
         );
         return data;
     }

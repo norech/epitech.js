@@ -1,12 +1,15 @@
-import { ActivityCode, InstanceCode, ModuleCode } from "../..";
+import { ActivityCode, EventCode, InstanceCode, ModuleCode } from "../..";
 
-export type UrlPathType = "all" | "project" | "module" | "activity";
+export type UrlPathType = "all" | "project" | "module" | "activity" | "event";
 
 export type ModuleUrl   = `/module/${number}/${ModuleCode}/${InstanceCode}/`
 | `/module/${number}/${ModuleCode}/${InstanceCode}`;
 
 export type ActivityUrl = `${ModuleUrl}/${ActivityCode}`
 | `${ModuleUrl}/${ActivityCode}/`;
+
+export type EventUrl = `${ModuleUrl}/${ActivityCode}/${EventCode}`
+| `${ModuleUrl}/${ActivityCode}/${EventCode}/`;
 
 export type ProjectUrl  = `${ActivityUrl}/project`
 | `${ActivityUrl}/project/`;
@@ -23,6 +26,10 @@ export function isActivityUrl(str: string): str is ActivityUrl {
     return /^\/module\/[0-9]{4}\/[A-Z]-[A-Z]{3}-[0-9]{3}\/[A-Z]{3}-[0-9]+-[0-9]+\/acti-[0-9]+[\/]?$/.test(str);
 }
 
+export function isEventUrl(str: string): str is EventUrl {
+    return /^\/module\/[0-9]{4}\/[A-Z]-[A-Z]{3}-[0-9]{3}\/[A-Z]{3}-[0-9]+-[0-9]+\/acti-[0-9]+\/event-[0-9]+[\/]?$/.test(str);
+}
+
 type ExcludeArrayElement<T extends string[], U>
     = T extends (infer R)[] ? R extends U ? never : R[] : never;
 
@@ -31,6 +38,7 @@ export type SolvedUrl<T extends UrlPathType[]> = T extends (infer R)[]
     : R extends "project" ? ProjectUrl | SolvedUrl<ExcludeArrayElement<T, "project">>
     : R extends "module" ? ModuleUrl | SolvedUrl<ExcludeArrayElement<T, "module">>
     : R extends "activity" ? ActivityUrl | SolvedUrl<ExcludeArrayElement<T, "activity">>
+    : R extends "event" ? EventUrl | SolvedUrl<ExcludeArrayElement<T, "event">>
     : never /*gonna give you up*/
     : never /*gonna let you down*/;
 
