@@ -37,7 +37,7 @@ export interface RawEventRegisteredUser {
     login: string,
     title: string | null,
     picture: string | null,
-    present: "present" | "absent" | "refused" | "excused" | "N/A",
+    present: "present" | "absent" | "refused" | "excused" | "fail" | "accept" | "N/A",
     token_trace: null,
     can_token: "0" | "1",
     registered: "0" | "1",
