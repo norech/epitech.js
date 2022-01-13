@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import { ActivityCode, InstanceCode, ModuleCode } from "../../common";
+import { ActivityCode, EventCode, InstanceCode, ModuleCode } from "../../common";
 import { RawActivity } from "./activity";
 import { RawDashboard } from "./dashboard";
 import { RawCourseFilterOutput, RawModule, RawModuleActivityAppointment, RawModuleBoardActivity, RawModuleRegisteredUser } from "./module";
@@ -9,7 +9,7 @@ import cheerio from "cheerio";
 import { RawProject, RawProjectFile, RawProjectRegisteredGroup } from "./project";
 import { stringify } from "querystring";
 import { RawStagesOutput } from "./stage";
-import { esc, isEventUrl, SolvedUrl } from ".";
+import { esc, isEventUrl, RawEventRegisteredUser, SolvedUrl } from ".";
 import { isActivityUrl, isModuleUrl, isProjectUrl, includesPathType, UrlPathType, ActivityUrl, ModuleUrl, ProjectUrl } from "./url";
 
 export class IntraRequestProvider {
@@ -358,6 +358,26 @@ export class RawIntra {
     async getProjectFilesByUrl(projectUrl: string): Promise<RawProjectFile[]> {
         projectUrl = this.solveUrl(projectUrl, ["project"]);
         const { data } = await this.request.get(projectUrl + "/file");
+        return data;
+    }
+
+    async getEventRegistered({ scolaryear, module, instance, activity, event }: {
+        scolaryear: number | `${number}`;
+        module: ModuleCode;
+        instance: InstanceCode;
+        activity: ActivityCode;
+        event: EventCode;
+    }): Promise<RawEventRegisteredUser[]> {
+        const { data } = await this.request.get(
+            esc`/module/${scolaryear}/${module}/${instance}/`
+                + esc`${activity}/${event}/registered`
+        );
+        return data;
+    }
+
+    async getEventRegisteredByUrl(eventUrl: string): Promise<RawEventRegisteredUser[]> {
+        eventUrl = this.solveUrl(eventUrl, ["event"]);
+        const { data } = await this.request.get(eventUrl + "/registered");
         return data;
     }
 

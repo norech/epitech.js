@@ -56,6 +56,7 @@ Here is a table matching each method of the raw classes and the corresponding en
 | `getProjectRegistered`         | `/module/:year/:mod/:ins/:act/project/registered`              |
 | `getProjectUnregistered`       | `/module/:year/:mod/:ins/:act/project/exportunregistered`      |
 | `getProjectFiles`              | `/module/:year/:mod/:ins/:act/project/file`                    |
+| `getEventRegistered`           | `/module/:year/:mod/:ins/:act/:event/registered`               |
 | `getStages`                    | `/stage`                                                       |
 | `getAutologin`                 | `/admin/autologin`                                             |
 
@@ -190,6 +191,14 @@ Get an array of files for the project.
 ##### `getProjectFilesByUrl(url): Promise<RawProjectFile[]>`
 
 Get an array of files for the project by project or activity url.
+
+##### `getEventRegistered({ scolaryear, module, instance, activity, event }): Promise<RawEventRegisteredUser[]>`
+
+Get the users registered to the event.
+
+##### `getEventRegisteredByUrl(eventUrl): Promise<RawEventRegisteredUser[]>`
+
+Get the users registered to the event by url.
 
 ##### `getStages(): Promise<RawStagesOutput>`
 

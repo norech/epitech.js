@@ -31,3 +31,16 @@ export interface RawEvent {
     desc_webservice: string,
     name_bocal: number
 }
+
+export interface RawEventRegisteredUser {
+    id: `${number}`,
+    login: string,
+    title: string | null,
+    picture: string | null,
+    present: "present" | "absent" | "N/A",
+    token_trace: null,
+    can_token: "0" | "1",
+    registered: "0" | "1",
+    date_ins: DatetimeLiteral,
+    date_modif: DatetimeLiteral | null
+}
