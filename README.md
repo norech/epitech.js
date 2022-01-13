@@ -55,7 +55,7 @@ Here is a table matching each method of the raw classes and the corresponding en
 | `getProject`                   | `/module/:year/:module/:instance/:activity/project`            |
 | `getProjectRegistered`         | `/module/:year/:mod/:ins/:act/project/registered`              |
 | `getProjectUnregistered`       | `/module/:year/:mod/:ins/:act/project/exportunregistered`      |
-| `getProjectFiles`              | `/module/:year/:mod/:ins/:act/project/files`                   |
+| `getProjectFiles`              | `/module/:year/:mod/:ins/:act/project/file`                    |
 | `getStages`                    | `/stage`                                                       |
 | `getAutologin`                 | `/admin/autologin`                                             |
 
