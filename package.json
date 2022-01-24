@@ -9,7 +9,7 @@
     "types",
     "intranet"
   ],
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Library to interact with the Epitech intranet",
   "main": "out/index.js",
   "scripts": {
