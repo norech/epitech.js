@@ -30,10 +30,24 @@ export class IntraRequestProvider {
     }
 
     async get(route: string, config?: AxiosRequestConfig) {
+        if (route.includes("?")) {
+            route += "&"
+        } else {
+            route += "?"
+        }
+        route += "format=json";
+
         return this.client.get(route, config);
     }
 
     async post(route: string, body: any, config?: AxiosRequestConfig) {
+        if (route.includes("?")) {
+            route += "&"
+        } else {
+            route += "?"
+        }
+        route += "format=json";
+
         body = body ? stringify(body) : undefined;
         return this.client.post(route, body, config);
     }
