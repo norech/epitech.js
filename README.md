@@ -188,6 +188,13 @@ Get an array of unregistered users logins for the project by project or activity
 
 Get an array of files for the project.
 
+##### `downloadFile(url): Promise<stream>`
+
+Download a file from the intranet by its url.
+
+The file will be downloaded and returned as an axios stream, which can be then
+be handled. See [the file download example](./src/examples/fileDownload.ts).
+
 ##### `getProjectFilesByUrl(url): Promise<RawProjectFile[]>`
 
 Get an array of files for the project by project or activity url.

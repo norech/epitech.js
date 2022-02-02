@@ -70,6 +70,17 @@ export class IntraRequestProvider {
         body = body ? stringify(body) : undefined;
         return this.client.post(route, body, config);
     }
+
+    async getStream(route: string, config?: AxiosRequestConfig) {
+        return this.client.get(route, {
+            responseType: "stream",
+            headers: {
+                "Accept": "application/octet-stream",
+                "Content-Type": "application/octet-stream"
+            },
+            ...config
+        });
+    }
 }
 
 export interface RawIntraConfig {
@@ -400,6 +411,12 @@ export class RawIntra {
         projectUrl = this.solveUrl(projectUrl, ["project"]);
         const { data } = await this.request.get(projectUrl + "/file/");
         return data;
+    }
+
+    async downloadFile(url: string): Promise<any> {
+        url = this.solveUrl(url, ["all"]);
+        const res = await this.request.getStream(url);
+        return res.data;
     }
 
     async getEventRegistered({ scolaryear, module, instance, activity, event }: {
