@@ -105,6 +105,9 @@ export class RawIntra {
         if (pathname.startsWith("/auth-") && i !== -1) { // autologin link
             pathname = pathname.slice(i);
         }
+        if (pathname.endsWith("/")) {
+            pathname = pathname.slice(0, -1);
+        }
 
         if (!validTypes || includesPathType(validTypes, "all"))
             return pathname as SolvedUrl<T>;
