@@ -391,14 +391,14 @@ export class RawIntra {
         activity: ActivityCode;
     }): Promise<RawProjectFile[]> {
         const { data } = await this.request.get(
-            esc`/module/${scolaryear}/${module}/${instance}/${activity}/project/file`
+            esc`/module/${scolaryear}/${module}/${instance}/${activity}/project/file/`
         );
         return data;
     }
 
     async getProjectFilesByUrl(projectUrl: string): Promise<RawProjectFile[]> {
         projectUrl = this.solveUrl(projectUrl, ["project"]);
-        const { data } = await this.request.get(projectUrl + "/file");
+        const { data } = await this.request.get(projectUrl + "/file/");
         return data;
     }
 
