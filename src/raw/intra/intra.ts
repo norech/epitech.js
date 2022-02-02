@@ -14,7 +14,8 @@ import { isActivityUrl, isModuleUrl, isProjectUrl, includesPathType, UrlPathType
 
 export class IntraRequestProvider {
     protected endpoint = "https://intra.epitech.eu/";
-    protected client: AxiosInstance
+    protected client: AxiosInstance;
+    protected cookies: {[key: string]: string} = {};
 
     constructor(autologin: string) {
         this.endpoint = autologin;
@@ -27,6 +28,24 @@ export class IntraRequestProvider {
                 'Content-Type': 'application/json'
             }
         })
+    }
+
+    getClient() {
+        return this.client;
+    }
+
+    async setTimezone(value: string) {
+        await this.setCookie("tz", value);
+    }
+
+    async setCookie(key: string, value: string) {
+        let cookieString = "";
+
+        this.cookies[key] = value;
+        for (const key in this.cookies) {
+            cookieString += esc`${key}=${this.cookies[key]}; `;
+        }
+        this.client.defaults.headers.Cookie = cookieString;
     }
 
     async get(route: string, config?: AxiosRequestConfig) {
@@ -54,7 +73,8 @@ export class IntraRequestProvider {
 }
 
 export interface RawIntraConfig {
-    autologin: string
+    autologin: string,
+    timezone?: string
 }
 
 export interface RawCourseFilters {
@@ -69,6 +89,10 @@ export class RawIntra {
 
     constructor(config: RawIntraConfig) {
         this.request = new IntraRequestProvider(config.autologin);
+
+        if (config.timezone) {
+            this.request.setTimezone(config.timezone);
+        }
     }
 
     solveUrl<T extends UrlPathType[]>(url: string, validTypes?: T | undefined): SolvedUrl<T> {
@@ -136,7 +160,7 @@ export class RawIntra {
         return esc<ProjectUrl>`/module/${scolaryear}/${module}/${instance}/${activity}/project`;
     }
 
-    async getRequestProvider() {
+    getRequestProvider() {
         return this.request;
     }
 
