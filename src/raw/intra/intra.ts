@@ -10,7 +10,7 @@ import { RawProject, RawProjectFile, RawProjectRegisteredGroup } from "./project
 import { stringify } from "querystring";
 import { RawStagesOutput } from "./stage";
 import { esc, isEventUrl, RawEventRegisteredUser, SolvedUrl } from ".";
-import { isActivityUrl, isModuleUrl, isProjectUrl, includesPathType, UrlPathType, ActivityUrl, ModuleUrl, ProjectUrl } from "./url";
+import { isActivityUrl, isModuleUrl, isProjectUrl, includesPathType, UrlPathType, ActivityUrl, ModuleUrl, ProjectUrl, isProjectFileUrl } from "./url";
 
 export class IntraRequestProvider {
     protected endpoint = "https://intra.epitech.eu/";
@@ -129,11 +129,20 @@ export class RawIntra {
             return pathname as SolvedUrl<T>;
         if (includesPathType(validTypes, "project") && isProjectUrl(pathname))
             return pathname as SolvedUrl<T>;
+        if (includesPathType(validTypes, "projectfile") && isProjectFileUrl(pathname))
+            return pathname as SolvedUrl<T>;
         if (includesPathType(validTypes, "event") && isEventUrl(pathname))
             return pathname as SolvedUrl<T>;
 
         if (includesPathType(validTypes, "project") && isActivityUrl(pathname))
-            return (pathname + "/project/")  as SolvedUrl<T>;
+            return (pathname + "/project/") as SolvedUrl<T>;
+
+        if (includesPathType(validTypes, "projectfile") && isProjectFileUrl(pathname + "/"))
+            return (pathname + "/") as SolvedUrl<T>;
+        if (includesPathType(validTypes, "projectfile") && isProjectUrl(pathname))
+            return (pathname + "/file/") as SolvedUrl<T>;
+        if (includesPathType(validTypes, "projectfile") && isActivityUrl(pathname))
+            return (pathname + "/project/file/") as SolvedUrl<T>;
 
         try {
             const lastSlash = pathname.lastIndexOf("/");
@@ -395,21 +404,29 @@ export class RawIntra {
         return data.split("\n");
     }
 
-    async getProjectFiles({ scolaryear, module, instance, activity }: {
+    async getProjectFiles({ scolaryear, module, instance, activity, path }: {
         scolaryear: number | `${number}`;
         module: ModuleCode;
         instance: InstanceCode;
         activity: ActivityCode;
+        path?: string;
     }): Promise<RawProjectFile[]> {
-        const { data } = await this.request.get(
-            esc`/module/${scolaryear}/${module}/${instance}/${activity}/project/file/`
-        );
-        return data;
+        const url = esc`/module/${scolaryear}/${module}/${instance}/${activity}/project/file/` + path;
+        return this.getProjectFilesByUrl(url);
     }
 
     async getProjectFilesByUrl(projectUrl: string): Promise<RawProjectFile[]> {
-        projectUrl = this.solveUrl(projectUrl, ["project"]);
-        const { data } = await this.request.get(projectUrl + "/file/");
+        projectUrl = this.solveUrl(projectUrl, ["projectfile"]);
+        if (projectUrl.endsWith("/"))
+            projectUrl = projectUrl.substring(0, projectUrl.length - 1);
+
+        const { data } = await this.request.get(projectUrl + "/");
+        if (data.error) {
+            const { data } = await this.request.get(projectUrl);
+            if (data.error)
+                throw data;
+            return data;
+        }
         return data;
     }
 
