@@ -5,7 +5,7 @@ import { RawDashboard } from "./dashboard";
 import { RawCourseFilterOutput, RawModule, RawModuleActivityAppointment, RawModuleBoardActivity, RawModuleRegisteredUser } from "./module";
 import { RawPlanningElement } from "./planning";
 import { RawUser, RawUserAbsencesOutput, RawUserEducationalUpdate, RawUserPartnersOutput } from "./user";
-import cheerio from "cheerio";
+import { load as loadCheerio } from "cheerio";
 import { RawProject, RawProjectFile, RawProjectRegisteredGroup } from "./project";
 import { stringify } from "querystring";
 import { RawStagesOutput } from "./stage";
@@ -210,7 +210,7 @@ export class RawIntra {
                 'Content-Type': 'text/html'
             }
         });
-        const $ = cheerio.load(data, { xmlMode: false });
+        const $ = loadCheerio(data, { xmlMode: false });
         const scripts = $("script");
         const regex = /<!--\s+window\.user(?:.|\n)+history:(\[\{"scolaryear":.+}])(?:\s|\n)+\}\);\s+\/\/-->/;
         const scrapedScript = scripts.filter((i, s) => regex.test($(s).toString())).first();
