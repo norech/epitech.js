@@ -107,10 +107,10 @@ export class RawIntra {
     }
 
     solveUrl<T extends UrlPathType[]>(url: string, validTypes?: T | undefined): SolvedUrl<T> {
-        if (!/^https?:\/\//.test(url)) // doesn't start with http or https
-            url = "/" + url;
         if (url.startsWith("/"))
             url = "https://intra.epitech.eu" + url;
+        else if (!/^https?:\/\//.test(url)) // doesn't start with http or https
+            url = "http://intra.epitech.eu/" + url;
 
         const uri = new URL(url);
         let pathname = uri.pathname;
