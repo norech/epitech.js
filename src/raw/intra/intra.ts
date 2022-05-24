@@ -11,11 +11,13 @@ import { stringify } from "querystring";
 import { RawStagesOutput } from "./stage";
 import { esc, isEventUrl, RawEventRegisteredUser, SolvedUrl } from ".";
 import { isActivityUrl, isModuleUrl, isProjectUrl, includesPathType, UrlPathType, ActivityUrl, ModuleUrl, ProjectUrl, isProjectFileUrl } from "./url";
+import { canBeIntraError, IntraError } from "./common";
 
 export class IntraRequestProvider {
     protected endpoint = "https://intra.epitech.eu/";
     protected client: AxiosInstance;
     protected cookies: {[key: string]: string} = {};
+    protected throwIntraError: boolean = true;
 
     constructor(autologin: string) {
         this.endpoint = autologin;
@@ -38,6 +40,10 @@ export class IntraRequestProvider {
         await this.setCookie("tz", value);
     }
 
+    disableThrowIntraError() {
+        this.throwIntraError = false;
+    }
+
     async setCookie(key: string, value: string) {
         let cookieString = "";
 
@@ -56,7 +62,11 @@ export class IntraRequestProvider {
         }
         route += "format=json";
 
-        return this.client.get(route, config);
+        const out = await this.client.get(route, config);
+        if (this.throwIntraError && canBeIntraError(out.data)) {
+            throw new IntraError(out.data);
+        }
+        return out;
     }
 
     async post(route: string, body: any, config?: AxiosRequestConfig) {
@@ -68,7 +78,11 @@ export class IntraRequestProvider {
         route += "format=json";
 
         body = body ? stringify(body) : undefined;
-        return this.client.post(route, body, config);
+        const out = await this.client.post(route, body, config);
+        if (this.throwIntraError && canBeIntraError(out.data)) {
+            throw new IntraError(out.data);
+        }
+        return out;
     }
 
     async getStream(route: string, config?: AxiosRequestConfig) {
@@ -85,7 +99,8 @@ export class IntraRequestProvider {
 
 export interface RawIntraConfig {
     autologin: string,
-    timezone?: string
+    timezone?: string,
+    noThrowFromIntra?: boolean
 }
 
 export interface RawCourseFilters {
@@ -103,6 +118,10 @@ export class RawIntra {
 
         if (config.timezone) {
             this.request.setTimezone(config.timezone);
+        }
+
+        if (config.noThrowFromIntra) {
+            this.request.disableThrowIntraError();
         }
     }
 
@@ -423,14 +442,22 @@ export class RawIntra {
         if (projectUrl.endsWith("/"))
             projectUrl = projectUrl.substring(0, projectUrl.length - 1);
 
-        const { data } = await this.request.get(projectUrl + "/");
-        if (data.error) {
-            const { data } = await this.request.get(projectUrl);
-            if (data.error)
-                throw data;
+        try {
+
+            const { data } = await this.request.get(projectUrl + "/");
+            if (canBeIntraError(data)) // since IntraError can be disabled, throw it anyway
+                throw new IntraError(data);
             return data;
+
+        } catch (err) {
+
+            if (err instanceof IntraError) {
+                const { data } = await this.request.get(projectUrl);
+                return data;
+            }
+            throw err;
+
         }
-        return data;
     }
 
     async downloadFile(url: string): Promise<any> {

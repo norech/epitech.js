@@ -14,6 +14,21 @@ export function esc<T extends string = string>(strs: TemplateStringsArray, ...ar
     return strs.map(str => str + (args.length > 0 ? encodeURIComponent(args.shift()) : "")).join('') as T;
 }
 
+export function canBeIntraError(data: any) {
+    return data && (data.error || data.message && data.office_auth_uri);
+}
+
+export class IntraError extends Error {
+    error: string;
+    message: string;
+    constructor(data: any) {
+        super(data.error ? data.error + ": " + data.message : data.message);
+        this.name = "IntraError";
+        this.error = data.error ?? "Intra error";
+        this.message = data.message;
+    }
+};
+
 export interface RawGroup {
     type: "group",
     login: string
