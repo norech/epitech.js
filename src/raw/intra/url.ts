@@ -25,7 +25,7 @@ export function isProjectUrl(str: string): str is ProjectUrl {
 }
 
 export function isProjectFileUrl(str: string): str is ProjectFileUrl {
-    return /^\/module\/[0-9]{4}\/[A-Z]-[A-Z]{3}-[0-9]{3}\/[A-Z]{3}-[0-9]+-[0-9]+\/acti-[0-9]+\/project\/file\/(?:\/[a-zA-Z0-9.\-&[^\/?]]*)$/.test(str);
+    return /^\/module\/[0-9]{4}\/[A-Z]-[A-Z]{3}-[0-9]{3}\/[A-Z]{3}-[0-9]+-[0-9]+\/acti-[0-9]+\/project\/file\/([a-zA-Z0-9.\- _~!$&'()*+,;=:@\/%]*)+$/.test(str);
 }
 
 export function isActivityUrl(str: string): str is ActivityUrl {
