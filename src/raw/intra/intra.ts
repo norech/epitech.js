@@ -100,7 +100,7 @@ export class IntraRequestProvider {
 export interface RawIntraConfig {
     autologin: string,
     timezone?: string,
-    noThrowIntraError: boolean
+    noThrowIntraError?: boolean
 }
 
 export interface RawCourseFilters {
