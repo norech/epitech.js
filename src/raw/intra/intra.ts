@@ -100,7 +100,7 @@ export class IntraRequestProvider {
 export interface RawIntraConfig {
     autologin: string,
     timezone?: string,
-    noThrowFromIntra?: boolean
+    noThrowIntraError: boolean
 }
 
 export interface RawCourseFilters {
@@ -120,7 +120,7 @@ export class RawIntra {
             this.request.setTimezone(config.timezone);
         }
 
-        if (config.noThrowFromIntra) {
+        if (config.noThrowIntraError) {
             this.request.disableThrowIntraError();
         }
     }
