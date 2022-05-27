@@ -55,6 +55,14 @@ export class IntraRequestProvider {
     }
 
     async get(route: string, config?: AxiosRequestConfig) {
+        const out = await this.client.get(route, config);
+        if (this.throwIntraError && canBeIntraError(out.data)) {
+            throw new IntraError(out.data);
+        }
+        return out;
+    }
+
+    async json(route: string, config?: AxiosRequestConfig) {
         if (route.includes("?")) {
             route += "&"
         } else {
@@ -62,9 +70,12 @@ export class IntraRequestProvider {
         }
         route += "format=json";
 
-        const out = await this.client.get(route, config);
-        if (this.throwIntraError && canBeIntraError(out.data)) {
-            throw new IntraError(out.data);
+        const out = await this.get(route, config);
+        if (this.throwIntraError && typeof out.data === "string") {
+            throw new IntraError({
+                error: "Invalid response",
+                message: out.data
+            });
         }
         return out;
     }
@@ -210,13 +221,13 @@ export class RawIntra {
     }
 
     async getDashboard(): Promise<RawDashboard> {
-        const { data } = await this.request.get("/");
+        const { data } = await this.request.json("/");
         return data;
     }
 
     async getUser(login?: string): Promise<RawUser> {
         login = login?.replace(/[?/#]+/g, "");
-        const { data } = await this.request.get(
+        const { data } = await this.request.json(
             login ? esc`/user/${login}/` : `/user/`
         );
         return data;
@@ -224,13 +235,13 @@ export class RawIntra {
 
     async getUserNetsoul(login: string): Promise<[number, number, number, number, number, number][]> {
         login = login?.replace(/[?/#]+/g, "");
-        const { data } = await this.request.get(esc`/user/${login}/netsoul`);
+        const { data } = await this.request.json(esc`/user/${login}/netsoul`);
         return data;
     }
 
     async getUserPartners(login: string): Promise<RawUserPartnersOutput> {
         login = login?.replace(/[?/#]+/g, "");
-        const { data } = await this.request.get(esc`/user/${login}/binome`);
+        const { data } = await this.request.json(esc`/user/${login}/binome`);
         return data;
     }
 
@@ -253,7 +264,7 @@ export class RawIntra {
 
     async getUserAbsences(login: string): Promise<RawUserAbsencesOutput> {
         login = login?.replace(/[?/#]+/g, "");
-        const { data } = await this.request.get(
+        const { data } = await this.request.json(
             esc`/user/${login}/notification/missed/`
         );
         return data;
@@ -266,14 +277,14 @@ export class RawIntra {
             const endDate = `${end.getFullYear()}-${end.getMonth() + 1}-${end.getDate()}`;
             query = esc`?start=${startDate}&end=${endDate}`;
         }
-        const { data } = await this.request.get(`/planning/load${query}`);
+        const { data } = await this.request.json(`/planning/load${query}`);
         return data;
     }
 
     async getModuleBoard(start: Date, end: Date): Promise<RawModuleBoardActivity[]> {
         const startDate = `${start.getFullYear()}-${start.getMonth() + 1}-${start.getDate()}`;
         const endDate = `${end.getFullYear()}-${end.getMonth() + 1}-${end.getDate()}`;
-        const { data } = await this.request.get(
+        const { data } = await this.request.json(
             esc`/module/board/?start=${startDate}&end=${endDate}`
         );
         return data;
@@ -295,7 +306,7 @@ export class RawIntra {
             preload, locationString, courseString, scolaryearString
         ].filter(s => s != undefined).join("&");
 
-        const { data } = await this.request.get(`/course/filter?${filterString}`);
+        const { data } = await this.request.json(`/course/filter?${filterString}`);
 
         return data;
     }
@@ -305,7 +316,7 @@ export class RawIntra {
         module: ModuleCode;
         instance: InstanceCode;
     }): Promise<RawModule> {
-        const { data } = await this.request.get(
+        const { data } = await this.request.json(
             esc`/module/${scolaryear}/${module}/${instance}/`
         );
         return data;
@@ -313,7 +324,7 @@ export class RawIntra {
 
     async getModuleByUrl(url: ModuleUrl | string): Promise<RawModule> {
         url = this.solveUrl(url, ["module"]);
-        const { data } = await this.request.get(url);
+        const { data } = await this.request.json(url);
         return data;
     }
 
@@ -322,7 +333,7 @@ export class RawIntra {
         module: ModuleCode;
         instance: InstanceCode;
     }): Promise<RawModuleRegisteredUser[]> {
-        const { data } = await this.request.get(
+        const { data } = await this.request.json(
             esc`/module/${scolaryear}/${module}/${instance}/registered`
         );
         return data;
@@ -330,7 +341,7 @@ export class RawIntra {
 
     async getModuleRegisteredByUrl(url: ModuleUrl | string): Promise<RawModuleRegisteredUser[]> {
         url = this.solveUrl(url, ["module"]);
-        const { data } = await this.request.get(url + "/registered");
+        const { data } = await this.request.json(url + "/registered");
         return data;
     }
 
@@ -340,7 +351,7 @@ export class RawIntra {
         instance: InstanceCode;
         activity: ActivityCode;
     }): Promise<RawActivity> {
-        const { data } = await this.request.get(
+        const { data } = await this.request.json(
             esc`/module/${scolaryear}/${module}/${instance}/${activity}/`
         );
         return data;
@@ -348,7 +359,7 @@ export class RawIntra {
 
     async getActivityByUrl(url: string): Promise<RawActivity> {
         url = this.solveUrl(url, ["activity"]);
-        const { data } = await this.request.get(url);
+        const { data } = await this.request.json(url);
         return data;
     }
 
@@ -358,7 +369,7 @@ export class RawIntra {
         instance: InstanceCode;
         activity: ActivityCode;
     }): Promise<RawModuleActivityAppointment> {
-        const { data } = await this.request.get(
+        const { data } = await this.request.json(
             esc`/module/${scolaryear}/${module}/${instance}/${activity}/rdv/`
         );
         return data;
@@ -366,7 +377,7 @@ export class RawIntra {
 
     async getActivityAppointmentsByUrl(url: ActivityUrl | string): Promise<RawModuleActivityAppointment> {
         url = this.solveUrl(url, ["activity"]);
-        const { data } = await this.request.get(`${url}/rdv/`);
+        const { data } = await this.request.json(`${url}/rdv/`);
         return data;
     }
 
@@ -376,7 +387,7 @@ export class RawIntra {
         instance: InstanceCode;
         activity: ActivityCode;
     }): Promise<RawProject> {
-        const { data } = await this.request.get(
+        const { data } = await this.request.json(
             esc`/module/${scolaryear}/${module}/${instance}/${activity}/project`
         );
         return data;
@@ -384,7 +395,7 @@ export class RawIntra {
 
     async getProjectByUrl(url: string): Promise<RawProject> {
         url = this.solveUrl(url, ["project"]);
-        const { data } = await this.request.get(url);
+        const { data } = await this.request.json(url);
         return data;
     }
 
@@ -394,7 +405,7 @@ export class RawIntra {
         instance: InstanceCode;
         activity: ActivityCode;
     }): Promise<RawProjectRegisteredGroup[]> {
-        const { data } = await this.request.get(
+        const { data } = await this.request.json(
             esc`/module/${scolaryear}/${module}/${instance}/${activity}/`
                 + `project/registered`
         );
@@ -403,7 +414,7 @@ export class RawIntra {
 
     async getProjectRegisteredByUrl(url: string): Promise<RawProjectRegisteredGroup[]> {
         url = this.solveUrl(url, ["project"]);
-        const { data } = await this.request.get(url + "/registered");
+        const { data } = await this.request.json(url + "/registered");
         return data;
     }
 
@@ -413,7 +424,7 @@ export class RawIntra {
         instance: InstanceCode;
         activity: ActivityCode;
     }): Promise<RawProjectRegisteredGroup[]> {
-        const { data } = await this.request.get(
+        const { data } = await this.request.json(
             esc`/module/${scolaryear}/${module}/${instance}/${activity}/`
                 + `project/exportunregistered`
         );
@@ -444,7 +455,7 @@ export class RawIntra {
 
         try {
 
-            const { data } = await this.request.get(projectUrl + "/");
+            const { data } = await this.request.json(projectUrl + "/");
             if (canBeIntraError(data)) // since IntraError can be disabled, throw it anyway
                 throw new IntraError(data);
             return data;
@@ -452,7 +463,7 @@ export class RawIntra {
         } catch (err) {
 
             if (err instanceof IntraError) {
-                const { data } = await this.request.get(projectUrl);
+                const { data } = await this.request.json(projectUrl);
                 return data;
             }
             throw err;
@@ -473,7 +484,7 @@ export class RawIntra {
         activity: ActivityCode;
         event: EventCode;
     }): Promise<RawEventRegisteredUser[]> {
-        const { data } = await this.request.get(
+        const { data } = await this.request.json(
             esc`/module/${scolaryear}/${module}/${instance}/`
                 + esc`${activity}/${event}/registered`
         );
@@ -482,19 +493,19 @@ export class RawIntra {
 
     async getEventRegisteredByUrl(eventUrl: string): Promise<RawEventRegisteredUser[]> {
         eventUrl = this.solveUrl(eventUrl, ["event"]);
-        const { data } = await this.request.get(eventUrl + "/registered");
+        const { data } = await this.request.json(eventUrl + "/registered");
         return data;
     }
 
     async getStages(): Promise<RawStagesOutput> {
-        const { data } = await this.request.get(
+        const { data } = await this.request.json(
             "/stage/load?format=json&offset=0&number=120"
         );
         return data;
     }
 
     async getAutologin() {
-        const { data } = await this.request.get("/admin/autolog");
+        const { data } = await this.request.json("/admin/autolog");
         return data.autologin;
     }
 
