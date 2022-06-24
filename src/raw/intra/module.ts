@@ -23,8 +23,9 @@ export interface RawModuleBoardActivity {
     rights: string[]
 }
 
-export interface RawModuleSummay {
+export interface RawModuleSummary {
     id: number,
+    title: string,
     title_cn: string | null,
     semester: number,
     num: `${number}`,
@@ -47,7 +48,7 @@ export interface RawModuleSummay {
 
 export interface RawCourseFilterOutput {
     preload: Array<[number, number, `${string}/${string}`, `${string}/${string}`, string]>,
-    items: RawModuleSummay[]
+    items: RawModuleSummary[]
 }
 
 export interface RawModuleActivityProject {
