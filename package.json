@@ -14,7 +14,8 @@
   "main": "out/index.js",
   "scripts": {
     "build": "tsc",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "rimraf out/examples",
+    "prepare": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -24,6 +25,7 @@
   "author": "Norech <Alexis CHERON>",
   "license": "MIT",
   "devDependencies": {
+    "rimraf": "^3.0.2",
     "typescript": "^4.4.2"
   },
   "dependencies": {
