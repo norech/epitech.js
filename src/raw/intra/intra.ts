@@ -20,7 +20,22 @@ export class IntraRequestProvider {
     protected throwIntraError: boolean = true;
 
     constructor(autologin: string) {
-        this.endpoint = autologin;
+        let autologinUrl: string;
+        try {
+            if (/^auth-[a-fA-F0-9]+$/.test(autologin)) {
+                autologinUrl = "https://intra.epitech.eu/" + autologin;
+            } else {
+                const url = new URL(autologin);
+                if (!/^\/auth-[a-fA-F0-9]+\/?$/.test(url.pathname)) {
+                    throw "Invalid path";
+                }
+                autologinUrl = "https://intra.epitech.eu" + url.pathname;
+            }
+        } catch (e) {
+            throw new IntraError({ message: "Invalid autologin: " + e });
+        }
+
+        this.endpoint = autologinUrl;
         this.client = axios.create({
             validateStatus: (status) => status < 500,
             baseURL: this.endpoint,
