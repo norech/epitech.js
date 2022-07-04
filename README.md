@@ -41,6 +41,7 @@ Here is a table matching each method of the raw classes and the corresponding en
 |--------------------------------|----------------------------------------------------------------|
 | `getDashboard`                 | `/`                                                            |
 | `getUser`                      | `/user/:user` or `/user`                                       |
+| `getUserDetails`               | `/user/:user/print/`                                           |
 | `getUserNetsoul`               | `/user/:user/netsoul`                                          |
 | `getUserPartners`              | `/user/:user/binome`                                           |
 | `getUserEducationalOverview`   | none (scraped from `/user/:user/#!/pedago`)                    |
@@ -67,15 +68,19 @@ Here is a table matching each method of the raw classes and the corresponding en
 
 ##### `getDashboard(): Promise<RawDashboard>`
 
-Get the dashboard informations.
+Get the dashboard information.
 
 ##### `getUser(login?: string): Promise<RawUser>`
 
-Get the user overall informations.
+Get the user overall information.
 
 If login is not provided, the current user will be used.
 
 If login is provided and is not the current user, you might need additional permissions.
+
+##### `getUserDetails(login: string): Promise<RawUserDetails>`
+
+Get the detailed profile of the user. If the specified user is not the current user, you might need additional permissions.
 
 ##### `getUserNetsoul(login: string): Promise<RawUser>`
 
@@ -97,7 +102,7 @@ Get the absences of the user. If the specified user is not the current user, you
 
 ##### `getPlanning(start?: Date, end?: Date): Promise<RawPlanningElement[]>`
 
-Gets the planning between the specified dates, both parameters are required to shiw planning in a range.
+Gets the planning between the specified dates, both parameters are required to show planning in a range.
 
 Otherwise, the full year planning will be loaded.
 
@@ -146,11 +151,11 @@ Get the registered users for a module by module url.
 
 ##### `getActivity({ scolaryear, module, instance, activity }): Promise<RawActivity>`
 
-Get the activity informations.
+Get the activity information.
 
 ##### `getActivityByUrl(url): Promise<RawActivity>`
 
-Get the activity informations by activity url.
+Get the activity information by activity url.
 
 ##### `getActivityAppointments({ scolaryear, module, instance, activity }): Promise<RawModuleActivityAppointment>`
 
@@ -265,15 +270,15 @@ If url doesn't match any valid types and the path transformation fails, an error
 
 ##### `solveModuleUrl({ scolaryear, module, instance }): ActivityUrl`
 
-Get the module route using the provided informations.
+Get the module route using the provided information.
 
 ##### `solveActivityUrl({ scolaryear, module, instance, activity }): ActivityUrl`
 
-Get the activity route using the provided informations.
+Get the activity route using the provided information.
 
 ##### `solveProjectUrl({ scolaryear, module, instance, activity }): ProjectUrl`
 
-Get the project route using the provided informations.
+Get the project route using the provided information.
 
 ##### `getRequestProvider(): IntraRequestProvider`
 

@@ -4,7 +4,7 @@ import { RawActivity } from "./activity";
 import { RawDashboard } from "./dashboard";
 import { RawCourseFilterOutput, RawModule, RawModuleActivityAppointment, RawModuleBoardActivity, RawModuleRegisteredUser } from "./module";
 import { RawPlanningElement } from "./planning";
-import { RawUser, RawUserAbsencesOutput, RawUserEducationalUpdate, RawUserPartnersOutput } from "./user";
+import { RawUser, RawUserAbsencesOutput, RawUserDetails, RawUserEducationalUpdate, RawUserPartnersOutput } from "./user";
 import { load as loadCheerio } from "cheerio";
 import { RawProject, RawProjectFile, RawProjectRegisteredGroup } from "./project";
 import { stringify } from "querystring";
@@ -281,6 +281,14 @@ export class RawIntra {
         login = login?.replace(/[?/#]+/g, "");
         const { data } = await this.request.json(
             esc`/user/${login}/notification/missed/`
+        );
+        return data;
+    }
+
+    async getUserDetails(login: string): Promise<RawUserDetails> {
+        login = login?.replace(/[?/#]+/g, "");
+        const { data } = await this.request.json(
+            esc`/user/${login}/print/`
         );
         return data;
     }
