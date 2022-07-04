@@ -61,6 +61,17 @@ Here is a table matching each method of the raw classes and the corresponding en
 | `getInternships`               | `/stage`                                                       |
 | `getAutologin`                 | `/admin/autologin`                                             |
 
+| Binding                        | Endpoint                                                       |
+|--------------------------------|----------------------------------------------------------------|
+| `registerEventByUrl`           | `/module/:year/:mod/:ins/:act/:event/register`                 |
+| `unregisterEventByUrl`         | `/module/:year/:mod/:ins/:act/:event/unregister`               |
+| `registerProjectByUrl`         | `/module/:year/:mod/:ins/:act/project/register`                |
+| `registerProjectGroupByUrl`    | `/module/:year/:mod/:ins/:act/project/register`                |
+| `destroyProjectGroupByUrl`     | `/module/:year/:mod/:ins/:act/project/destroygroup`            |
+| `joinGroupByUrl`               | `/module/:year/:mod/:ins/:act/project/confirmjoingroup`        |
+| `declineJoinGroupByUrl`        | `/module/:year/:mod/:ins/:act/project/declinejoingroup`        |
+| `leaveGroupByUrl`              | `/module/:year/:mod/:ins/:act/project/confirmleavegroup`       |
+
 
 ### Classes
 
