@@ -287,6 +287,6 @@ Get the request provider that performs the API calls.
 
 #### `IntraRequestProvider`
 
-##### `get(route: string, config?: AxionRequestConfig): Promise<AxiosResponse>`
+##### `get(route: string, config?: AxiosRequestConfig): Promise<AxiosResponse>`
 
-##### `post(route: string, body: any, config?: AxionRequestConfig): Promise<AxiosResponse>`
+##### `post(route: string, body: any, config?: AxiosRequestConfig): Promise<AxiosResponse>`
