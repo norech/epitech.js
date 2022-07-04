@@ -33,9 +33,9 @@ const intra = new RawIntra({
 
 ## Safety concerns
 
-Old versions of epitech.js did not have any security measures built-in. It is therefore recommended to use more recent versions (`v0.1.7+`).
+Old versions of epitech.js did not have any security measures or sanity checks built-in. It is therefore recommended having a recent version of epitech.js (at least `v0.1.7`).
 
-Since `v0.2.0`, epitech.js performs an autologin link validation. Previous versions of epitech.js did not perform this check, and could lead to security issues.
+Since `v0.2.0`, epitech.js performs an autologin link validation. Previous versions of epitech.js did not perform this check, which could lead to security issues when using invalid autologin links.
 
 Since `v0.2.0`, epitech.js provides an `indirect` authentication strategy to avoid leaking your autologin link. This strategy performs an authentication request separately from your requests. As of this release, it is the default strategy. Previous versions used a `direct` strategy, which was insecure.
 
