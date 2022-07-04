@@ -520,6 +520,9 @@ export class RawIntra {
         return data;
     }
 
+    /**
+     * @deprecated use getInternships instead
+     */
     async getStages(): Promise<RawInternshipOutput> {
         return this.getInternships();
     }
