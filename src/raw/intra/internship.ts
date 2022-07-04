@@ -87,9 +87,9 @@ export interface RawInternship {
     nb_stage_current: `${number}`
 }
 
-export interface RawInternshipOutput {
+export interface RawInternshipsOutput {
     items: RawInternship[];
 }
 
 export type RawStage = RawInternship;
-export type RawStageOutput = RawInternshipOutput;
+export type RawStageOutput = RawInternshipsOutput;
