@@ -72,6 +72,8 @@ Here is a table matching each method of the raw classes and the corresponding en
 | `declineJoinGroupByUrl`        | `/module/:year/:mod/:ins/:act/project/declinejoingroup`        |
 | `leaveGroupByUrl`              | `/module/:year/:mod/:ins/:act/project/confirmleavegroup`       |
 
+> Note: The same endpoints can be used to perform different actions or fetch different data, as the parameters or the payloads can be different.
+
 
 ### Classes
 
