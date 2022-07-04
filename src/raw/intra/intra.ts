@@ -18,8 +18,9 @@ export class IntraRequestProvider {
     protected client: AxiosInstance;
     protected cookies: {[key: string]: string} = {};
     protected throwIntraError: boolean = true;
+    protected authStrategy: string;
 
-    constructor(autologin: string) {
+    constructor(autologin: string, authStrategy = "default") {
         let autologinUrl: string;
         try {
             if (/^auth-[a-fA-F0-9]+$/.test(autologin)) {
@@ -35,16 +36,89 @@ export class IntraRequestProvider {
             throw new IntraError({ message: "Invalid autologin: " + e });
         }
 
-        this.endpoint = autologinUrl;
+        this.authStrategy = authStrategy;
+
+        if (authStrategy == "default")
+            authStrategy = "indirect";
+
+        if (authStrategy == "direct") {
+            this.endpoint = autologinUrl;
+        } else if(authStrategy == "indirect") {
+            this.endpoint = "https://intra.epitech.eu/";
+        } else {
+            throw new IntraError({ message: "Invalid auth strategy: " + authStrategy });
+        }
+
         this.client = axios.create({
-            validateStatus: (status) => status < 500,
+            validateStatus: (status) => status < 500 && status != 403,
             baseURL: this.endpoint,
             timeout: 30 * 1000,
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }
-        })
+        });
+
+        if (authStrategy === "indirect") {
+            this._initIndirectAuthInterceptors(autologinUrl);
+        }
+    }
+
+    _initIndirectAuthInterceptors(autologinUrl: string) {
+        let firstLoggedIn = false;
+
+        this.client.interceptors.request.use(async (config) => {
+            if (!firstLoggedIn) {
+                const newCookies = await this._refreshIndirectAuth(autologinUrl);
+                firstLoggedIn = true;
+                if (config.headers?.Cookie !== undefined) {
+                    config.headers.Cookie = [
+                        config.headers.Cookie,
+                        ...newCookies
+                    ].join(";");
+                } else {
+                    if (config.headers === undefined) {
+                        config.headers = {};
+                    }
+                    config.headers.Cookie = newCookies.join(";");
+                }
+            }
+            return config;
+        }, (error) => error);
+
+        this.client.interceptors.response.use((response) => response,
+            async (error) => {
+                if (error.response.status === 403 && !error.config?._retry) {
+                    const newCookies = await this._refreshIndirectAuth(autologinUrl);
+                    error.config._retry = true;
+                    if (error.config.headers.Cookie !== undefined) {
+                        const oldCookies: string = error.config.headers.Cookie;
+                        const newCookieKeys = newCookies.map(c => c.split("=")[0].trim());
+                        error.config.headers.Cookie = [
+                            oldCookies.split(";")
+                                .filter(c => newCookieKeys.indexOf(c.split("=")[0].trim()) === -1)
+                                .join(";"),
+                            ...newCookies
+                        ].join(";");
+                    } else {
+                        error.config.headers.Cookie = newCookies.join(";");
+                    }
+                    return this.client(error.config);
+                }
+                return error;
+            });
+    }
+
+    async _refreshIndirectAuth(autologinUrl: string) {
+        const getToken = await axios.get(autologinUrl + "/admin/autolog/?format=json");
+        const newCookies = getToken.headers["set-cookie"]
+            ?.map(c => c.split(";")[0]) ?? [];
+
+        for(const cookie of newCookies) {
+            const [key, value] = cookie.split("=");
+            this.setCookie(key, value);
+        }
+        return newCookies;
     }
 
     getClient() {
@@ -66,7 +140,7 @@ export class IntraRequestProvider {
         for (const key in this.cookies) {
             cookieString += esc`${key}=${this.cookies[key]}; `;
         }
-        this.client.defaults.headers.Cookie = cookieString;
+        this.client.defaults.headers.common.Cookie = cookieString;
     }
 
     async get(route: string, config?: AxiosRequestConfig) {
@@ -126,6 +200,7 @@ export class IntraRequestProvider {
 export interface RawIntraConfig {
     autologin: string,
     timezone?: string,
+    authStrategy?: "default" | "direct" | "indirect",
     noThrowIntraError?: boolean
 }
 
@@ -140,7 +215,7 @@ export class RawIntra {
     protected request;
 
     constructor(config: RawIntraConfig) {
-        this.request = new IntraRequestProvider(config.autologin);
+        this.request = new IntraRequestProvider(config.autologin, config.authStrategy);
 
         if (config.timezone) {
             this.request.setTimezone(config.timezone);
