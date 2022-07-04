@@ -58,7 +58,7 @@ Here is a table matching each method of the raw classes and the corresponding en
 | `getProjectUnregistered`       | `/module/:year/:mod/:ins/:act/project/exportunregistered`      |
 | `getProjectFiles`              | `/module/:year/:mod/:ins/:act/project/file`                    |
 | `getEventRegistered`           | `/module/:year/:mod/:ins/:act/:event/registered`               |
-| `getStages`                    | `/stage`                                                       |
+| `getInternships`               | `/stage`                                                       |
 | `getAutologin`                 | `/admin/autologin`                                             |
 
 
@@ -212,7 +212,7 @@ Get the users registered to the event.
 
 Get the users registered to the event by url.
 
-##### `getStages(): Promise<RawStagesOutput>`
+##### `getInternships(): Promise<RawInternshipsOutput>`
 
 Get the internships for current user.
 

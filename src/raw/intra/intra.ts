@@ -8,7 +8,7 @@ import { RawUser, RawUserAbsencesOutput, RawUserDetails, RawUserEducationalUpdat
 import { load as loadCheerio } from "cheerio";
 import { RawProject, RawProjectFile, RawProjectRegisteredGroup } from "./project";
 import { stringify } from "querystring";
-import { RawStagesOutput } from "./stage";
+import { RawInternshipOutput } from "./internship";
 import { esc, isEventUrl, RawEventRegisteredUser, SolvedUrl } from ".";
 import { isActivityUrl, isModuleUrl, isProjectUrl, includesPathType, UrlPathType, ActivityUrl, ModuleUrl, ProjectUrl, isProjectFileUrl } from "./url";
 import { canBeIntraError, IntraError } from "./common";
@@ -520,7 +520,11 @@ export class RawIntra {
         return data;
     }
 
-    async getStages(): Promise<RawStagesOutput> {
+    async getStages(): Promise<RawInternshipOutput> {
+        return this.getInternships();
+    }
+
+    async getInternships(): Promise<RawInternshipOutput> {
         const { data } = await this.request.json(
             "/stage/load?format=json&offset=0&number=120"
         );

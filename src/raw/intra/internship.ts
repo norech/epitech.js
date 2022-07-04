@@ -1,6 +1,6 @@
 import { DateLiteral, DatetimeLiteral, DayLiteral, HourLiteral } from "../..";
 
-export interface RawStage {
+export interface RawInternship {
     begin: `${DateLiteral}`,
     end: `${DateLiteral}`,
     date_diff: `${DayLiteral}`,
@@ -87,6 +87,9 @@ export interface RawStage {
     nb_stage_current: `${number}`
 }
 
-export interface RawStagesOutput {
-    items: RawStage[];
+export interface RawInternshipOutput {
+    items: RawInternship[];
 }
+
+export type RawStage = RawInternship;
+export type RawStageOutput = RawInternshipOutput;
