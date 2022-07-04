@@ -212,7 +212,7 @@ Get the users registered to the event.
 
 Get the users registered to the event by url.
 
-##### `getInternships(): Promise<RawInternshipsOutput>`
+##### `getInternships(): Promise<RawInternshipOutput>`
 
 Get the internships for current user.
 
