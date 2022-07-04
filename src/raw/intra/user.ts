@@ -63,7 +63,7 @@ export interface RawUser {
     groups: RawUserGroup[],
     events: RawUserEvent[],
     credits: number,
-    gpa: RawUserGPA,
+    gpa: RawUserGPA[],
     spice: any,
     nsstat: RawUserNSStat | null
 }
