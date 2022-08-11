@@ -12,9 +12,54 @@ npm install epitech.js
 
 You might want to take a look at files in [`src/examples`](./src/examples).
 
+You may also want to have a look at the Usage section below to discover how login to the intranet.
+
 ## Usage
 
-### Login to the intranet (auth providers)
+### Login to the intranet (Puppeteer auth provider)
+
+Epitech.js can be used with [Puppeteer](https://puppeteer.dev) to login to the intranet without using an autologin link and without having to renew the session manually.
+
+To do so, you need to install an additional dependency:
+
+```bash
+npm install @epitech.js/puppeteer-auth-provider
+```
+
+You will then need to import the `RawIntra` and `PuppeteerAuthProvider` classes:
+
+```ts
+import { RawIntra } from 'epitech.js';
+import { PuppeteerAuthProvider } from '@epitech.js/puppeteer-auth-provider';
+
+// or
+
+const { RawIntra } = require('epitech.js');
+const { PuppeteerAuthProvider } = require('@epitech.js/puppeteer-auth-provider');
+```
+
+The `RawIntra` class will provide you a low-abstraction access to the Intranet endpoints.
+
+The `PuppeteerAuthProvider` class will provide you a way to login to the intranet for a long period of time.
+
+> You may want to read the [@epitech.js/puppeteer-auth-provider](https://github.com/norech/epitech.js-puppeteer-auth-provider) documentation to know how to make adjustments and **[how to fix common issues](https://github.com/norech/epitech.js-puppeteer-auth-provider#troubleshooting)**.
+
+```js
+const intra = new RawIntra({
+    provider: new PuppeteerAuthProvider({
+        // path to the file where the auth data will be stored
+        storageFilePath: './storage.json',
+
+        // ... additional options for the PuppeteerAuthProvider are available
+    })
+});
+```
+
+You can then use the `RawIntra` class to access the intranet endpoints! Feel free to have a look at the [Documentation](#documentation) section to see the available endpoints.
+
+Puppeteer is only one way to login to the intranet with epitech.js, but not the only one! See the sections below to learn more about other ways to login to the intranet and access endpoints with epitech.js.
+
+### Login to the intranet (custom auth provider - cookie auth)
 
 Import the `RawIntra` class, that provides you a low-abstraction access to the Intranet endpoints:
 ```ts
@@ -25,17 +70,17 @@ const { RawIntra } = require("epitech.js");  // Classic NodeJS
 
 You will also need to use an auth provider to get an access cookie.
 
-> For now, epitech.js does not support any auth provider, but you can easily add yours.
-> See the [`auth providers`](#auth-providers) section for more information.
+> See the [auth providers](#auth-providers) section for more information on how to create your own auth provider.
+
 
 Here is an example provider, the access cookie can be grabbed from a browser authenticated to the intranet (Inspector -> Storage -> Cookies -> `user` -> Value).
 
-Please note that access cookies are only valid for a limited time, which is why you may use this provider only for testing purposes.
+Please note that authentication cookies are only valid for a limited time (usually up to a week), which is why you may only directly use this provider for testing purposes or short automation scripts.
 
 ```ts
 class MyProvider {
     async refresh() {
-        return "{access_cookie}";
+        return "{authentication cookie}";
     }
 }
 ```
@@ -52,8 +97,8 @@ And now you can access the intranet endpoints!
 
 ### Login to the intranet (autologin - legacy)
 
-> Since 08/2022, autologin access doesn't work anymore and is whitelisted.
-> You will need to use an auth provider in order to manually provide and refresh authentication cookies.
+> Since August 2022, autologin access doesn't work any more and is locked behind a whitelist.
+> You will probably need to use an auth provider in order to manually provide and refresh authentication cookies instead.
 
 Go into `https://intra.epitech.eu/admin/autolog` and grab your autologin link.
 
@@ -71,6 +116,8 @@ const intra = new RawIntra({
 ```
 
 ## Safety concerns
+
+This section describes some safety concerns regarding the usage of previous versions of this library.
 
 Old versions of epitech.js did not have any security measures or sanity checks built-in. It is therefore recommended having a recent version of epitech.js (at least `v0.1.7`).
 
@@ -365,4 +412,4 @@ An auth provider is a class that implements the `AuthProvider` interface.
 Returns a promise that resolves to the new authentication cookie.
 Is called a first time before the first API call, and then each time the authentication cookie has expired.
 
-Please note that if a request still fails after a refresh, no further refreshes will be made until the next requests and the current request will still fail.
+Please note that if a request still fails after a refresh, no further refreshes will be made until the next request is done and the current request will fail.
