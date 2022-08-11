@@ -53,7 +53,7 @@ And now you can access the intranet endpoints!
 ### Login to the intranet (autologin - legacy)
 
 > Since 08/2022, autologin access doesn't work anymore and is whitelisted.
-> You will need to login manually.
+> You will need to use an auth provider in order to manually provide and refresh authentication cookies.
 
 Go into `https://intra.epitech.eu/admin/autolog` and grab your autologin link.
 
