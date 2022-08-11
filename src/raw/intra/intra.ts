@@ -147,7 +147,7 @@ export class IntraRequestProvider {
             });
     }
 
-    async _refreshCookiesFromProvider(method: "get" | "refresh") {
+    async _refreshCookiesFromProvider(method: "refresh") {
         if (this.provider === undefined) {
             throw new IntraError("No provider");
         }
