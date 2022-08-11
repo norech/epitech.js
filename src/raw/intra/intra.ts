@@ -76,9 +76,9 @@ export class IntraRequestProvider {
 
     constructor(config: RawIntraConfig) {
         let autologinUrl: string | undefined;
-        this.authStrategy = config.authStrategy ?? "default";
+        this.authStrategy = config.autologinAuthStrategy ?? "default";
         if (typeof config.autologin !== "undefined") {
-            autologinUrl = this._initAutologin(config.autologin, config.authStrategy);
+            autologinUrl = this._initAutologin(config.autologin, config.autologinAuthStrategy);
         }
         if (typeof config.provider !== "undefined") {
             this.provider = config.provider;
@@ -236,7 +236,7 @@ export interface RawIntraConfig {
     provider?: AuthProvider,
     autologin?: string,
     timezone?: string,
-    authStrategy?: "default" | "direct" | "indirect",
+    autologinAuthStrategy?: "default" | "direct" | "indirect",
     noThrowIntraError?: boolean
 }
 
