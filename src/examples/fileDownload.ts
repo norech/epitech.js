@@ -7,8 +7,12 @@ import { RawIntra } from "../";  // import { RawIntra } from "epitech.js";
 
 (async function(){
 
+    class Provider {
+        refresh = async () => "{authentication cookie}";
+    }
+
     const intra = new RawIntra({
-        autologin: "https://intra.epitech.eu/auth-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+        provider: new Provider()
     });
 
     const stream = await intra.downloadFile("/module/2021/B-PRO-300/RUN-3-1/acti-458897/project/file/B-PRO-300_internship.pdf");

@@ -2,13 +2,17 @@ import { RawIntra } from "../";  // import { RawIntra } from "epitech.js";
 
 (async function(){
 
+    class Provider {
+        refresh = async () => "{authentication cookie}";
+    }
+
     const intra1 = new RawIntra({
-        autologin: "https://intra.epitech.eu/auth-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        provider: new Provider(),
         timezone: "Europe/Paris"
     });
 
     const intra2 = new RawIntra({
-        autologin: "https://intra.epitech.eu/auth-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        provider: new Provider(),
         timezone: "Indian/Reunion"
     });
 

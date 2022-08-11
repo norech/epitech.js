@@ -14,7 +14,46 @@ You might want to take a look at files in [`src/examples`](./src/examples).
 
 ## Usage
 
-### Login to the intranet
+### Login to the intranet (auth providers)
+
+Import the `RawIntra` class, that provides you a low-abstraction access to the Intranet endpoints:
+```ts
+import { RawIntra } from "epitech.js";  // TypeScript / ES6
+// or
+const { RawIntra } = require("epitech.js");  // Classic NodeJS
+```
+
+You will also need to use an auth provider to get an access cookie.
+
+> For now, epitech.js does not support any auth provider, but you can easily add yours.
+> See the [`auth providers`](#auth-providers) section for more information.
+
+Here is an example provider, the access cookie can be grabbed from a browser authenticated to the intranet (Inspector -> Storage -> Cookies -> `user` -> Value).
+
+Please note that access cookies are only valid for a limited time, which is why you may use this provider only for testing purposes.
+
+```ts
+class MyProvider {
+    async refresh() {
+        return "{access_cookie}";
+    }
+}
+```
+
+Once you have the access cookie, you can create a `RawIntra` instance:
+
+```ts
+const intra = new RawIntra({
+    provider: new MyProvider(),
+});
+```
+
+And now you can access the intranet endpoints!
+
+### Login to the intranet (autologin - legacy)
+
+> Since 08/2022, autologin access doesn't work anymore and is whitelisted.
+> You will need to login manually.
 
 Go into `https://intra.epitech.eu/admin/autolog` and grab your autologin link.
 
@@ -313,3 +352,17 @@ Get the request provider that performs the API calls.
 ##### `get(route: string, config?: AxiosRequestConfig): Promise<AxiosResponse>`
 
 ##### `post(route: string, body: any, config?: AxiosRequestConfig): Promise<AxiosResponse>`
+
+
+## Auth Providers
+
+Auth providers are used to provide authentication cookies to epitech.js in order to perform API calls.
+
+An auth provider is a class that implements the `AuthProvider` interface.
+
+#### `AuthProvider`
+##### `refresh(): Promise<string>` - Refresh the authentication cookie.
+Returns a promise that resolves to the new authentication cookie.
+Is called a first time before the first API call, and then each time the authentication cookie has expired.
+
+Please note that if a request still fails after a refresh, no further refreshes will be made until the next requests and the current request will still fail.

@@ -2,16 +2,25 @@ import { RawIntra } from "../";  // import { RawIntra } from "epitech.js";
 
 (async function(){
 
+    class Provider {
+        refresh = async () => "{authentication cookie}";
+    }
+
     const intra = new RawIntra({
-        autologin: "https://intra.epitech.eu/auth-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+        provider: new Provider()
     });
+
+    console.log(intra.solveUrl("https://intra.epitech.eu/module/2021/B-YEP-410/RUN-4-1/acti-503248/project/file/binaries/?format=json"));
+    console.log(intra.solveUrl("https://intra.epitech.eu/module/2021/B-YEP-410/RUN-4-1/acti-503248/project/file/binaries/"));
+    console.log(intra.solveUrl("/module/2021/B-PRO-300/RUN-3-1/acti-458897/project", ["projectfile"]));
+    console.log(intra.solveUrl("https://intra.epitech.eu/module/2021/B-YEP-410/RUN-4-1/acti-503248/project/file/binaries/zappy_server", ['projectfile']));
 
     console.log(await intra.getModuleByUrl("/module/2021/B-PRO-300/RUN-3-1/acti-458897/project/file/B-PRO-300_internship.pdf"));
     
     console.log(await intra.getModuleByUrl("/auth-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/module/2021/B-PRO-300/RUN-3-1/acti-458897/project/file/B-PRO-300_internship.pdf"));
     
     console.log(await intra.getModuleByUrl("https://intra.epitech.eu/module/2021/B-PRO-300/RUN-3-1/acti-458897"));
-    
+
     try {
         // not a module url
         console.log("URL: /auth-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/")
