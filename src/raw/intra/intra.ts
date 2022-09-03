@@ -740,4 +740,23 @@ export class RawIntra {
         );
         return data;
     }
+    
+    async downloadCalendar(
+        location: string,
+        onlyMyEvent: bool,
+        onlyMyModule: bool,
+        onlyMyPromo: bool,
+        semesters: Array<int>): Promise<any> {
+
+        if (semesters.length == 0) {
+            throw new Error("No semester selected");
+        }
+
+        let url: string = '/planning/load?format=ical&location=' + location;
+        if (onlyMyPromo) url += '&onlymypromo=true';
+        if (onlyMyEvent) url += '&onlymyevent=true';
+        if (onlyMyModule) url += '&onlymymodule=true';
+        url += '&semesters=' + semesters.join(',');
+        return await this.downloadFile(url);
+    }
 }
