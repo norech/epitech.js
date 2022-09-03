@@ -275,12 +275,9 @@ export class RawIntra {
         if (pathname.startsWith("/auth-") && i !== -1) { // autologin link
             pathname = pathname.slice(i);
         }
-        if (pathname.endsWith("/")) {
-            pathname = pathname.slice(0, -1);
-        }
 
         if (!validTypes || includesPathType(validTypes, "all"))
-            return pathname as SolvedUrl<T>;
+            return pathname + uri.search as SolvedUrl<T>;
 
         if (includesPathType(validTypes, "module") && isModuleUrl(pathname))
             return pathname as SolvedUrl<T>;
@@ -607,6 +604,7 @@ export class RawIntra {
 
     async downloadFile(url: string): Promise<any> {
         url = this.solveUrl(url, ["all"]);
+        console.log(url)
         const res = await this.request.getStream(url);
         return res.data;
     }
