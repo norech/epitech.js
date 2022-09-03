@@ -385,6 +385,24 @@ export class RawIntra {
         return JSON.parse(scrapedString[1]);
     }
 
+    async getCalendarFile(input: {
+        locations: string[];
+        semesters: number[];
+        onlyMyEvent?: boolean;
+        onlyMyModule?: boolean;
+        onlyMyPromo?: boolean;
+    }) {
+        if (input.semesters.length == 0)
+            throw new Error("No semester selected");
+    
+        let request: string = esc`/planning/load?format=ical&location=${input.locations.join(',')}`;
+        if (input.onlyMyPromo) request += '&onlymypromo=true';
+        if (input.onlyMyEvent) request += '&onlymyevent=true';
+        if (input.onlyMyModule) request += '&onlymymodule=true';
+        request += esc`&semesters=${input.semesters.join(',')}`;
+        return this.downloadFile(request);
+    }
+
     async getUserAbsences(login: string): Promise<RawUserAbsencesOutput> {
         login = login?.replace(/[?/#]+/g, "");
         const { data } = await this.request.json(
@@ -604,7 +622,6 @@ export class RawIntra {
 
     async downloadFile(url: string): Promise<any> {
         url = this.solveUrl(url, ["all"]);
-        console.log(url)
         const res = await this.request.getStream(url);
         return res.data;
     }

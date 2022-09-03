@@ -143,6 +143,7 @@ Here is a table matching each method of the raw classes and the corresponding en
 | `getUserEducationalOverview`   | none (scraped from `/user/:user/#!/pedago`)                    |
 | `getUserAbsences`              | `/user/:user/absences`                                         |
 | `getPlanning`                  | `/planning/load`                                               |
+| `getCalendarFile`              | `/planning/load?format=ical`                                   |
 | `getModuleBoard`               | `/module/board`                                                |
 | `filterCourses`                | `/course/filter`                                               |
 | `getModule`                    | `/module/:year/:module/:instance`                              |
@@ -214,6 +215,24 @@ Get the absences of the user. If the specified user is not the current user, you
 Gets the planning between the specified dates, both parameters are required to show planning in a range.
 
 Otherwise, the full year planning will be loaded.
+
+##### `getCalendarFile({ locations, semesters, ... })`
+
+Gets the calendar file stream.
+
+The file will be downloaded and returned as an axios stream, which can be then
+be handled. See [the calendar download example](./src/examples/calendarDownload.ts).
+
+```js
+    const stream = await intra.getCalendarFile({
+        locations: ['FR/PAR', 'FR'],
+        semesters: [0, 3, 4],
+        onlyMyEvent: false,
+        onlyMyPromo: true,
+        onlyMyModule: true
+    });
+    stream.pipe(fs.createWriteStream("calendar.ical"));
+```
 
 ##### `getModuleBoard(start: Date, end: Date): Promise<RawModuleBoardActivity[]>`
 
