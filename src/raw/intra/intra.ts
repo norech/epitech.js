@@ -85,7 +85,7 @@ export class IntraRequestProvider {
         }
 
         this.client = axios.create({
-            validateStatus: (status) => status < 500 && status != 403,
+            validateStatus: (status) => status < 500 && !(!this.throwIntraError && status == 403),
             baseURL: this.endpoint,
             timeout: 30 * 1000,
             headers: {
