@@ -201,8 +201,8 @@ export class IntraRequestProvider {
                 message: out.data
             });
         }
-        if (this.throwIntraError && canBeIntraError(out)) {
-            throw new IntraError(out);
+        if (this.throwIntraError && canBeIntraError(out.data)) {
+            throw new IntraError(out.data);
         }
         return out;
     }
