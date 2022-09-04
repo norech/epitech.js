@@ -597,6 +597,9 @@ export class RawIntra {
         activity: ActivityCode;
         path?: string;
     }): Promise<RawProjectFile[]> {
+        if (typeof path === "undefined")
+            path = "";
+        
         const url = esc`/module/${scolaryear}/${module}/${instance}/${activity}/project/file/` + path;
         return this.getProjectFilesByUrl(url);
     }
