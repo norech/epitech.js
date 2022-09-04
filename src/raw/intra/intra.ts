@@ -42,6 +42,7 @@ export class IntraRequestProvider {
     protected throwIntraError: boolean = true;
     protected authStrategy: string;
     protected provider: AuthProvider | undefined;
+    protected debugPrintRequests: boolean;
 
     _initAutologin(autologin: string, authStrategy: string = "indirect") {
         let autologinUrl: string;
@@ -77,6 +78,7 @@ export class IntraRequestProvider {
     constructor(config: RawIntraConfig) {
         let autologinUrl: string | undefined;
         this.authStrategy = config.autologinAuthStrategy ?? "default";
+        this.debugPrintRequests = config.debugPrintRequests ?? false;
         if (typeof config.autologin !== "undefined") {
             autologinUrl = this._initAutologin(config.autologin, config.autologinAuthStrategy);
         }
@@ -179,7 +181,13 @@ export class IntraRequestProvider {
     }
 
     async get(route: string, config?: AxiosRequestConfig) {
+        if (this.debugPrintRequests) {
+            console.log("[epitech.js] req> GET " + route);
+        }
         const out = await this.client.get(route, config);
+        if (this.debugPrintRequests) {
+            console.log("[epitech.js] res> " + JSON.stringify(out.data, undefined, 4).split("\n").join("\n[epitech.js] res> "));
+        }
         if (this.throwIntraError && canBeIntraError(out.data)) {
             throw new IntraError(out.data);
         }
@@ -216,7 +224,15 @@ export class IntraRequestProvider {
         route += "format=json";
 
         body = body ? stringify(body) : undefined;
+
+        if (this.debugPrintRequests) {
+            console.log("[epitech.js] req> POST " + route);
+            console.log("[epitech.js] req> " + body);
+        }
         const out = await this.client.post(route, body, config);
+        if (this.debugPrintRequests) {
+            console.log("[epitech.js] res> " + JSON.stringify(out.data, undefined, 4).split("\n").join("\n[epitech.js] res> "));
+        }
         if (this.throwIntraError && canBeIntraError(out.data)) {
             throw new IntraError(out.data);
         }
@@ -224,6 +240,9 @@ export class IntraRequestProvider {
     }
 
     async getStream(route: string, config?: AxiosRequestConfig) {
+        if (this.debugPrintRequests) {
+            console.log("[epitech.js] req> GET " + route);
+        }
         return this.client.get(route, {
             responseType: "stream",
             headers: {
@@ -240,7 +259,8 @@ export interface RawIntraConfig {
     autologin?: string,
     timezone?: string,
     autologinAuthStrategy?: "default" | "direct" | "indirect",
-    noThrowIntraError?: boolean
+    noThrowIntraError?: boolean,
+    debugPrintRequests?: boolean
 }
 
 export interface RawCourseFilters {
