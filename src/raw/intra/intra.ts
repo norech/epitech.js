@@ -620,6 +620,8 @@ export class RawIntra {
 
             if (err instanceof IntraError) {
                 const { data } = await this.request.json(projectUrl);
+                if (this.throwIntraError && canBeIntraError(data))
+                    throw new IntraError(data);
                 return data;
             }
             throw err;
