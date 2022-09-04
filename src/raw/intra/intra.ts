@@ -87,7 +87,7 @@ export class IntraRequestProvider {
         }
 
         this.client = axios.create({
-            validateStatus: (status) => status < 500 && !(!this.throwIntraError && status == 403),
+            validateStatus: (status) => status < 500,
             baseURL: this.endpoint.endsWith("/") ? this.endpoint.substring(0, this.endpoint.length - 1) : this.endpoint,
             timeout: 30 * 1000,
             headers: {
@@ -126,27 +126,30 @@ export class IntraRequestProvider {
             return config;
         }, (error) => error);
 
-        this.client.interceptors.response.use((response) => response,
-            async (error) => {
-                if (error.response.status === 403 && !error.config?._retry) {
-                    const newCookies = await this._refreshCookiesFromProvider("refresh");
-                    error.config._retry = true;
-                    if (error.config.headers.Cookie !== undefined) {
-                        const oldCookies: string = error.config.headers.Cookie;
-                        const newCookieKeys = newCookies.map(c => c.split("=")[0].trim());
-                        error.config.headers.Cookie = [
-                            oldCookies.split(";")
-                                .filter(c => newCookieKeys.indexOf(c.split("=")[0].trim()) === -1)
-                                .join(";"),
-                            ...newCookies
-                        ].join(";");
-                    } else {
-                        error.config.headers.Cookie = newCookies.join(";");
-                    }
-                    return this.client(error.config);
+        this.client.interceptors.response.use(async (response) => {
+            if (!response.config)
+                response.config = {};
+            if (response.status === 403 && !response.config._retry) {
+                const newCookies = await this._refreshCookiesFromProvider("refresh");
+                response.config._retry = true;
+                if (response.config.headers?.Cookie !== undefined) {
+                    const oldCookies: string = response.config.headers.Cookie as string;
+                    const newCookieKeys = newCookies.map(c => c.split("=")[0].trim());
+                    response.config.headers.Cookie = [
+                        oldCookies.split(";")
+                            .filter(c => newCookieKeys.indexOf(c.split("=")[0].trim()) === -1)
+                            .join(";"),
+                        ...newCookies
+                    ].join(";");
+                } else {
+                    if (!response.config.headers)
+                    response.config.headers = {};
+                    response.config.headers.Cookie = newCookies.join(";");
                 }
-                return error;
-            });
+                return this.client(response.config);
+            }
+            return response;
+        }, (error) => error);
     }
 
     async _refreshCookiesFromProvider(method: "refresh") {
