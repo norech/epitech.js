@@ -279,6 +279,10 @@ export class RawIntra {
         if (!validTypes || includesPathType(validTypes, "all"))
             return pathname + uri.search as SolvedUrl<T>;
 
+        if (pathname.endsWith("/") && uri.search.length == 0) {
+            pathname = pathname.slice(0, -1);
+        }
+
         if (includesPathType(validTypes, "module") && isModuleUrl(pathname))
             return pathname as SolvedUrl<T>;
         if (includesPathType(validTypes, "activity") && isActivityUrl(pathname))
