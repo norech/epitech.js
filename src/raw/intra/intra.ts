@@ -129,24 +129,25 @@ export class IntraRequestProvider {
         this.client.interceptors.response.use(async (response) => {
             if (!response.config)
                 response.config = {};
-            if (response.status === 403 && !response.config._retry) {
+            const config: any = response.config;
+            if (response.status === 403 && !config._retry) {
                 const newCookies = await this._refreshCookiesFromProvider("refresh");
-                response.config._retry = true;
-                if (response.config.headers?.Cookie !== undefined) {
-                    const oldCookies: string = response.config.headers.Cookie as string;
+                config._retry = true;
+                if (config.headers?.Cookie !== undefined) {
+                    const oldCookies: string = config.headers.Cookie;
                     const newCookieKeys = newCookies.map(c => c.split("=")[0].trim());
-                    response.config.headers.Cookie = [
+                    config.headers.Cookie = [
                         oldCookies.split(";")
                             .filter(c => newCookieKeys.indexOf(c.split("=")[0].trim()) === -1)
                             .join(";"),
                         ...newCookies
                     ].join(";");
                 } else {
-                    if (!response.config.headers)
-                    response.config.headers = {};
-                    response.config.headers.Cookie = newCookies.join(";");
+                    if (!config.headers)
+                        config.headers = {};
+                    config.headers.Cookie = newCookies.join(";");
                 }
-                return this.client(response.config);
+                return this.client(config);
             }
             return response;
         }, (error) => error);
