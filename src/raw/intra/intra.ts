@@ -430,7 +430,7 @@ export class RawIntra {
         if (input.onlyMyPromo) request += '&onlymypromo=true';
         if (input.onlyMyEvent) request += '&onlymyevent=true';
         if (input.onlyMyModule) request += '&onlymymodule=true';
-        request += esc`&semesters=${input.semesters.join(',')}`;
+        request += esc`&semester=${input.semesters.join(',')}`;
         return this.downloadFile(request);
     }
 
