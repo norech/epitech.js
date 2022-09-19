@@ -40,7 +40,7 @@ export interface RawModuleSummary {
     flags: `${number}`,
     credits: `${number}`,
     rights: string[],
-    status: "valid" | "fail" | "ongoing",
+    status: "notregistered" | "valid" | "fail" | "ongoing",
     waiting_grades: null,
     active_promo: "0" | "1",
     open: "0" | "1"
@@ -72,7 +72,7 @@ export interface RawModuleActivityEvent {
     location: `${string}/${string}/${string}` | null,
     nb_max_students_projet: `${number}` | null,
     already_register: `${number}` | null,
-    user_status: "present" | "absent" | null,
+    user_status: "present" | "absent" | "refused" | "excused" | "fail" | "accept" | null,
     allow_token: "0" | "1",
     assistants: any[]
 }
